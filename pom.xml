@@ -1,0 +1,114 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.le.matrix.template</groupId>
+    <artifactId>matrix-microservice-template</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>matrix-facade-template</module>
+        <module>matrix-service-template</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <name>matrix-microservice-template</name>
+    <url>http://maven.apache.org</url>
+    <description>
+        服务框架模板工程
+    </description>
+    <parent>
+        <groupId>com.le.matrixframework</groupId>
+        <artifactId>matrix-starter-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <developers>
+        <developer>
+            <id>linzhanbo</id>
+            <name>linzhanbo</name>
+            <email>linzhanbo@le.com</email>
+            <organization>LeCloud Software, Inc.</organization>
+            <organizationUrl>http://lecloud.com/</organizationUrl>
+            <roles>
+                <role>Project lead</role>
+            </roles>
+        </developer>
+        <developer>
+            <id>lisuxiao</id>
+            <name>lisuxiao</name>
+            <email>lisuxiao@letv.com</email>
+            <organization>LeCloud Software, Inc.</organization>
+            <organizationUrl>http://lecloud.com/</organizationUrl>
+            <roles>
+                <role>Project lead</role>
+            </roles>
+        </developer>
+    </developers>
+    <dependencyManagement>
+        <dependencies>
+
+        </dependencies>
+    </dependencyManagement>
+    <build>
+        <plugins>
+            <!--jdk版本>=1.7-->
+            <!--dubbox 需要在JDK 1.7以上运行-->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.1</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <!--私有仓库配置  begin-->
+    <repositories>
+        <!--私有仓库 url-->
+        <repository>
+            <id>letv.public</id>
+            <name>Letv.com Repository</name>
+            <url>http://10.75.137.254:8083/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+    <!--私有仓库配置  end-->
+    <!--私有插件配置 begin-->
+    <pluginRepositories>
+        <!--私有仓库插件 url-->
+        <pluginRepository>
+            <id>letv.public</id>
+            <name>Letv.com Repository</name>
+            <url>http://10.75.137.254:8083/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+    <!--deploy begin-->
+    <distributionManagement>
+        <!--deploy url-->
+        <repository>
+            <id>project-release</id>
+            <name>Projects Release repository</name>
+            <url>http://10.75.137.254:8083/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>project-snapshots</id>
+            <name>Projects SnapShot repository</name>
+            <url>http://10.75.137.254:8083/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+    <!--deploy end-->
+</project>
