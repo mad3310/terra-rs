@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 调用HelloWorldFacade服务 -->
+    <!--<dubbo:reference interface="com.le.matrix.rediscade.HelloWorldFacade" id="helloWorldssService"
+                     check="false" />-->
+</beans>

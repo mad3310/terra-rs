@@ -2,19 +2,101 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.le.matrix.template</groupId>
-    <artifactId>matrix-microservice-template</artifactId>
+    <groupId>com.le.matrix.redis</groupId>
+    <artifactId>terra-rs</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <modules>
-        <module>matrix-facade-template</module>
-        <module>matrix-service-template</module>
-    </modules>
     <packaging>pom</packaging>
+    
+    <modules>
+        <module>terra-service</module>
+        <module>terra-facade</module>
+    </modules>
+    
+    <profiles>
+	    <profile>
+	        <id>local</id>
+	        <activation>
+	            <activeByDefault>true</activeByDefault>
+	        </activation>
+	        <properties>
+	            <db.url>jdbc:mysql://10.204.29.161:3306/paascloud_test?useUnicode=true&amp;characterEncoding=utf-8</db.url>
+	            <db.username>webportal</db.username>
+	            <db.password>H6ZMvaimaKGyrwRb4u7tAIjTTGflemmWySrZwT/lt51IkVR7+WrwhNdAZcnO4WjQJp6NH2KO1++qjblh8Y12fg==</db.password>
+	
+				<dubbo.registry.zkAddr>127.0.0.1:2181</dubbo.registry.zkAddr>
+				
+	            <terra.portal.http>http://127.0.0.1:8081</terra.portal.http>
+	            <oauth.auth.http>https://login.lecloud.com</oauth.auth.http>
+	
+	            <webportal.errormail.to>lisuxiao@le.com</webportal.errormail.to>
+	            <service.notice.email.to>lisuxiao@le.com</service.notice.email.to>
+	            <service.operation.notice.email.to>lisuxiao@le.com</service.operation.notice.email.to>
+	            <start.timing.jobs>N</start.timing.jobs>
+	
+	            <webportal.log.path>D:</webportal.log.path>
+	
+	            <task.executor.size>30</task.executor.size>
+	
+	            <com.letv.cache.implStyle>Local</com.letv.cache.implStyle>
+	
+	        </properties>
+	    </profile>
+	
+	    <profile>
+	        <id>test</id>
+	        <properties>
+	            <db.url>jdbc:mysql://127.0.0.1:3306/paascloud_test?useUnicode=true&amp;characterEncoding=utf-8</db.url>
+	            <db.username>webportal</db.username>
+	            <db.password>H6ZMvaimaKGyrwRb4u7tAIjTTGflemmWySrZwT/lt51IkVR7+WrwhNdAZcnO4WjQJp6NH2KO1++qjblh8Y12fg==</db.password>
+	
+				<dubbo.registry.zkAddr>127.0.0.1:2181</dubbo.registry.zkAddr>
+				
+	            <terra.portal.http>http://10.154.238.29</terra.portal.http>
+	            <oauth.auth.http>https://login.lecloud.com</oauth.auth.http>
+	
+	            <webportal.errormail.to>lisuxiao@le.com;linzhanbo@le.com;sunweiwei1@le.com;zhangtao8@le.com</webportal.errormail.to>
+	            <service.notice.email.to>lisuxiao@le.com;linzhanbo@le.com;sunweiwei1@le.com;zhangtao8@le.com</service.notice.email.to>
+	            <service.operation.notice.email.to>lisuxiao@le.com;linzhanbo@le.com;sunweiwei1@le.com;zhangtao8@le.com</service.operation.notice.email.to>
+	            <start.timing.jobs>N</start.timing.jobs>
+	
+	            <webportal.log.path>/var/log</webportal.log.path>
+	
+	            <task.executor.size>30</task.executor.size>
+	
+	            <com.letv.cache.implStyle>Local</com.letv.cache.implStyle>
+	        </properties>
+	    </profile>
+	
+	    <profile>
+	        <id>production</id>
+	        <properties>
+	            <db.url>jdbc:mysql://10.130.85.171:3306/paascloud_test?useUnicode=true&amp;characterEncoding=utf-8&amp;zeroDateTimeBehavior=convertToNull</db.url>
+	            <db.username>paascloud_wr</db.username>
+	            <db.password>fwpJzm3md6csTb6bRdCCbgcw+aZmm3uV5cakYDGXJ6FOGBrAP2K0l2KHe2QplGI66Ev3X0HdXBA+QkIqI/l8pQ==</db.password>
+	
+				<dubbo.registry.zkAddr>127.0.0.1:2181</dubbo.registry.zkAddr>
+			
+	            <terra.portal.http>http://10.150.149.121:8080</terra.portal.http>
+	            <oauth.auth.http>https://login.lecloud.com</oauth.auth.http>
+	            
+	            <!-- 使用邮件组无法识别，暂时使用邮箱名 -->
+	            <webportal.errormail.to>lisuxiao@le.com;linzhanbo@le.com;zhoubingzheng@le.com;</webportal.errormail.to>
+	            <service.notice.email.to>lisuxiao@le.com;linzhanbo@le.com;liujinliu@le.com;zhoubingzheng@le.com;wulicheng@le.com;gaoqiang3@le.com;zhangchengqiang@le.com</service.notice.email.to>
+	            <service.operation.notice.email.to>zhoubingzheng@le.com;gaoqiang3@le.com;zhangchengqiang@le.com</service.operation.notice.email.to>
+	            <start.timing.jobs>N</start.timing.jobs>
+	
+	            <webportal.log.path>/var/log</webportal.log.path>
+	
+	            <task.executor.size>150</task.executor.size>
+	
+	            <com.letv.cache.implStyle>Remote</com.letv.cache.implStyle>
+	
+	        </properties>
+	    </profile>
+    </profiles>
 
-    <name>matrix-microservice-template</name>
-    <url>http://maven.apache.org</url>
     <description>
-        服务框架模板工程
+        redis服务框架工程
     </description>
 
     <organization>
@@ -22,7 +104,7 @@
         <url>http://lecloud.com/</url>
     </organization>
     <scm>
-        <url>http://git.letv.cn/le_matrix/matrix-microservice-template.git</url>
+        <url>http://git.letv.cn/le_matrix/terra-rs.git</url>
     </scm>
     <prerequisites>
         <!--maven版本限制-->
