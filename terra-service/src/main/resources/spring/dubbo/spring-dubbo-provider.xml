@@ -12,8 +12,9 @@
     <dubbo:registry protocol="zookeeper" address="${dubbo.registry.zkAddr}" />
     <!--自动扫描该包路径，省去每个都配合dubbo:service-->
     <dubbo:annotation package="com.le.matrix.redis.service"/>
+    <dubbo:provider filter="dealExceptionFilter" />
     <!-- dubbo协议定义 -->
-    <dubbo:protocol name="dubbo" port="${dubbo.protocol.port.dubbo}"/>
+    <dubbo:protocol name="dubbo" accesslog="true" port="${dubbo.protocol.port.dubbo}"/>
 
     <!--使用内置tomcat服务器   可以省去webapp里面内容          !!!与下面二选一-->
     <!--如果直接Main启动/junit启动（一般测试时候用），使用下面配置  -->
@@ -34,10 +35,11 @@
         port：和服务器端口保持一致
         contextpath：和web服务器web.xml定义保持一致
         server：默认servlet，在没有在web服务器中运行的时候，可以写tomcat等由应用启动一个web服务器-->
-    <dubbo:protocol name="rest" port="${dubbo.protocol.port.rest}" contextpath="services" server="servlet"/>
+    <dubbo:protocol name="rest" accesslog="true" port="${dubbo.protocol.port.rest}" contextpath="services" server="servlet"/>
 
     <!--暴露服务列表-->
     <!--关于service属性配置看http://dubbo.io/User+Guide-zh.htm#UserGuide-zh-%253Cdubbo%253Aservice%252F%253E-->
+    <!--开发手册看http://dubbo.io/Developer+Guide-zh.htm#DeveloperGuide-zh-%E8%B0%83%E7%94%A8%E6%8B%A6%E6%88%AA%E6%89%A9%E5%B1%95-->
     <!--
                   interface     接口名
                   ref           服务对象实现引用
@@ -60,4 +62,10 @@
         3.验证服务端抛出异常，客户端dubbo/rest接收异常
         4.验证服务端异常统一处理，并返回对应http状态码
     -->
+    
+    <bean id="dealExceptionFilter" class="com.le.matrix.redis.service.impl.DealExceptionFilter">
+	    <property name="defaultEmailSender" ref="defaultEmailSender" />
+	    <property name="ERROR_MAIL_ENABLED" value="${error.email.enabled}" />
+	    <property name="ERROR_MAIL_ADDRESS" value="${error.email.to}" />
+	</bean>
 </beans>

@@ -6,13 +6,19 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
     <description>服务Spring全局配置</description>
+    
+    <import resource="classpath:common-applicationContext.xml" />
+    <import resource="classpath:freemarker-applicationContext.xml" />
+    <import resource="spring-email.xml"/>
 
     <!-- 采用注释的方式配置bean -->
     <context:annotation-config/>
     <!-- 配置要扫描的包 -->
     <context:component-scan base-package="com.le.matrix.redis"/>
+    <context:component-scan base-package="com.letv.portal"/>
     <!-- 读入配置属性文件 -->
     <context:property-placeholder location="classpath:db.properties,classpath:config.properties"/>
+    
     <!-- proxy-target-class默认"false",更改为"ture"使用CGLib动态代理 -->
     <aop:aspectj-autoproxy proxy-target-class="true"/>
 

@@ -115,9 +115,20 @@
 	 <logger name="com.ibatis.common.jdbc.SimpleDataSource"> <level value="DEBUG" /> </logger> 
 	<logger name="com.ibatis.common.jdbc.ScriptRunner"> <level value="DEBUG" /> </logger> 
 	<logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate"> <level value="DEBUG" /> </logger>
-	<logger name="com.alibaba.dubbo"><level value="DEBUG" /> </logger>
 	
 	<logger name="com.le" level="DEBUG">
+		<appender-ref ref="file-info" />
+		<appender-ref ref="file-debug" />
+		<appender-ref ref="file-error" />
+		<appender-ref ref="file-str" />
+	</logger>
+	<logger name="com.letv" level="DEBUG">
+		<appender-ref ref="file-info" />
+		<appender-ref ref="file-debug" />
+		<appender-ref ref="file-error" />
+		<appender-ref ref="file-str" />
+	</logger>
+	<logger name="com.alibaba.dubbo" level="DEBUG">
 		<appender-ref ref="file-info" />
 		<appender-ref ref="file-debug" />
 		<appender-ref ref="file-error" />

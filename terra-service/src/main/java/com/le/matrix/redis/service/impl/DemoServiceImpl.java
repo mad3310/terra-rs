@@ -1,12 +1,14 @@
 package com.le.matrix.redis.service.impl;
 
-import com.le.matrix.redis.dao.DemoDao;
-import com.le.matrix.redis.facade.IDemo;
-import com.le.matrix.redis.model.Demo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.le.matrix.redis.dao.DemoDao;
+import com.le.matrix.redis.facade.IDemo;
+import com.le.matrix.redis.model.Demo;
+import com.letv.common.email.ITemplateMessageSender;
 
 /**
  * Created by linzhanbo on 2016/10/11.
@@ -17,7 +19,7 @@ public class DemoServiceImpl implements IDemo {
 
     @Autowired
     private DemoDao userDao;
-
+    
     @Override
     public int deleteByPrimaryKey(Integer id) {
         logger.debug("Delete User：{}", id);
@@ -32,6 +34,7 @@ public class DemoServiceImpl implements IDemo {
 
     @Override
     public Demo selectByPrimaryKey(Integer id) {
+    	Integer.parseInt("fdaf");
         logger.debug("Select User：{}", id);
         return userDao.selectByPrimaryKey(id);
     }
@@ -41,4 +44,5 @@ public class DemoServiceImpl implements IDemo {
         logger.debug("Update User：{}", record.toString());
         return userDao.updateByPrimaryKeySelective(record);
     }
+    
 }
