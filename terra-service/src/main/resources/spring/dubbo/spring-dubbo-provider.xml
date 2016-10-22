@@ -63,9 +63,4 @@
         4.验证服务端异常统一处理，并返回对应http状态码
     -->
     
-    <bean id="dealExceptionFilter" class="com.le.matrix.redis.service.impl.DealExceptionFilter">
-	    <property name="defaultEmailSender" ref="defaultEmailSender" />
-	    <property name="ERROR_MAIL_ENABLED" value="${error.email.enabled}" />
-	    <property name="ERROR_MAIL_ADDRESS" value="${error.email.to}" />
-	</bean>
 </beans>

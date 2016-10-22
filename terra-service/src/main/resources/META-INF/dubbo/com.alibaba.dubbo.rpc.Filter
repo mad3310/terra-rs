@@ -1,1 +1,1 @@
-dealExceptionFilter=com.le.matrix.redis.service.impl.DealExceptionFilter
+dealExceptionFilter=com.le.matrix.redis.filter.DealExceptionFilter
