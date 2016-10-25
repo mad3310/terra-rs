@@ -50,7 +50,8 @@
                   validation    是否启用JSR303标准注解验证，如果启用，将对方法参数上的注解进行校验
                   version       服务版本，建议使用两位数字版本，如：1.0，通常在接口不兼容时版本号才需要升级
            -->
-    <dubbo:service interface="com.le.matrix.redis.facade.IDemo" ref="demoService" validation="true"/>
+    <dubbo:service interface="com.le.matrix.redis.facade.IDemoService" ref="demoService" validation="true"/>
+    <dubbo:service interface="com.le.matrix.redis.facade.ILoginService" ref="loginService" validation="true"/>
 
     <!--<dubbo:reference interface="com.xxx.XxxService">
         <dubbo:method name="findXxx" timeout="3000" retries="2" />

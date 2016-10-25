@@ -27,9 +27,9 @@ import com.letv.common.exception.OauthException;
 import com.letv.common.exception.ValidateException;
 
 @Service("dealExceptionService")
-public class DealExceptionService {
+public class DealExceptionServiceImpl {
 	
-	private Logger logger = LoggerFactory.getLogger(DealExceptionService.class);
+	private Logger logger = LoggerFactory.getLogger(DealExceptionServiceImpl.class);
 	
 	@Value("${error.email.to}")
 	protected String ERROR_MAIL_ADDRESS;
@@ -68,16 +68,16 @@ public class DealExceptionService {
 	{
 		Map<String,Object> params = new HashMap<String,Object>();
 		params.put("exceptionContent", stackTraceStr);
-		params.put("requestUrl", request.getRequestURL());
-		
-		String requestValue = getRequestValue(request);
-		params.put("exceptionParams",  StringUtils.isBlank(requestValue) ? "无" : requestValue);
+		//兼容rpc调用没有request
+		if(null != request) {
+			params.put("requestUrl", request.getRequestURL());
+			params.put("hostIp", request.getRemoteHost());
+			String requestValue = getRequestValue(request);
+			params.put("exceptionParams",  StringUtils.isBlank(requestValue) ? "无" : requestValue);
+		}
 		params.put("exceptionMessage",  exceptionMessage == null ? "无" : exceptionMessage);
 		
-		params.put("hostIp", request.getRemoteHost());
-		
-		
-		MailMessage mailMessage = new MailMessage("乐视云平台web-porta系统", ERROR_MAIL_ADDRESS,"异常错误发生","erroremail.ftl",params);
+		MailMessage mailMessage = new MailMessage("乐视云平台web-porta系统", ERROR_MAIL_ADDRESS,"terra-service异常错误","erroremail.ftl",params);
 		try {
 			defaultEmailSender.sendMessage(mailMessage);
 		} catch (Exception e) {

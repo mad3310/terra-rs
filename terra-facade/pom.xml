@@ -19,5 +19,9 @@
             <groupId>com.le.matrixframework</groupId>
             <artifactId>matrix-facade</artifactId>
         </dependency>
+        <dependency>
+		  	<groupId>com.letv.cloudplatform</groupId>
+		  	<artifactId>webportal-common</artifactId>
+		</dependency>
     </dependencies>
 </project>

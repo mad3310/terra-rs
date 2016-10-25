@@ -13,7 +13,7 @@ import com.alibaba.dubbo.rpc.Invocation;
 import com.alibaba.dubbo.rpc.Invoker;
 import com.alibaba.dubbo.rpc.Result;
 import com.alibaba.dubbo.rpc.RpcException;
-import com.le.matrix.redis.service.impl.DealExceptionService;
+import com.le.matrix.redis.service.impl.DealExceptionServiceImpl;
 
 /**
  * 异常处理
@@ -25,9 +25,9 @@ public class DealExceptionFilter implements Filter{
    
 	private Logger logger = LoggerFactory.getLogger(DealExceptionFilter.class);
 	
-	private DealExceptionService dealExceptionService;
+	private DealExceptionServiceImpl dealExceptionService;
 
-	public void setDealExceptionService(DealExceptionService dealExceptionService) {
+	public void setDealExceptionService(DealExceptionServiceImpl dealExceptionService) {
 		this.dealExceptionService = dealExceptionService;
 	}
 

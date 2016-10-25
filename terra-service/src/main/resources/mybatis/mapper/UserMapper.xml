@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.le.matrix.redis.dao.IUserDao">
+
+	<!-- Result Map -->
+	<resultMap id="BaseResultMap" type="User">
+		<result column="ID" property="id" />
+		<result column="USERNAME" property="userName" />
+		<result column="PASSWORD" property="password" />
+		<result column="EMAIL" property="email" />
+		<result column="PASSPORTID" property="passportId" />
+		<result column="LASTLOGINTIME" property="lastLoginTime" />
+		<result column="LASTLOGINIP" property="lastLoginIp" />
+		<result column="CURRENTLOGINTIME" property="currentLoginTime" />
+		<result column="CURRENTLOGINIP" property="currentLoginIp" />
+		<result column="REGISTERDATE" property="registerDate" />
+		<result column="IS_ADMIN" property="isAdmin" />
+		
+		<result column="PHONE" property="phone" />
+		<result column="ICON_URL" property="iconUrl" />
+		
+		<result column="OAUTH_ID" property="oauthId" />
+		
+		<result column="DELETED" property="deleted" />
+		<result column="CREATE_TIME" property="createTime" />
+		<result column="CREATE_USER" property="createUser" />
+		<result column="UPDATE_TIME" property="updateTime" />
+		<result column="UPDATE_USER" property="updateUser" />
+	</resultMap>
+	<!-- 查询条件 -->
+	<sql id="Example_Where_Clause">
+		where 1=1
+		<trim suffixOverrides=",">
+			<if test="id != null  ">
+				and ID=#{id}
+			</if>
+			<if test="userName != null  and userName != '' ">
+				and USERNAME =#{userName}
+			</if>
+			<if test="email != null  and email != '' ">
+				and EMAIL =#{email}
+			</if>
+		</trim>
+	</sql>
+	
+	<!-- WEBPORTAL_DB_USER table all fields -->
+	<sql id="Base_Column_List">
+		ID,USERNAME,EMAIL,PASSPORT_ID,LAST_LOGIN_TIME,LASTLOGIN_IP,
+		CURRENT_LOGIN_TIME,CURRENT_LOGIN_IP,REGISTER_DATE,IS_ADMIN,
+		DELETED,CREATE_TIME,CREATE_USER,UPDATE_TIME,UPDATE_USER,PHONE,ICON_URL,OAUTH_ID
+	</sql>
+	
+	<!-- 插入记录 -->
+	<insert id="insert" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+	insert into WEBPORTAL_USER (USERNAME,EMAIL,PASSPORT_ID,LAST_LOGIN_TIME,LASTLOGIN_IP, CURRENT_LOGIN_TIME,CURRENT_LOGIN_IP,REGISTER_DATE,IS_ADMIN, CREATE_TIME,CREATE_USER,UPDATE_TIME,UPDATE_USER,PHONE,ICON_URL,OAUTH_ID) values
+    (#{userName},#{email},#{passportId},#{lastLoginTime},#{lastLoginIp},#{currentLoginTime},#{currentLoginIp},#{registerDate},#{isAdmin},now(),#{createUser},now(),#{updateUser},#{phone},#{iconUrl},#{oauthId}) 
+	</insert>
+	
+	
+	<!-- 物理删除 -->
+	<update id="delete" parameterType="User">
+		delete from WEBPORTAL_USER where ID = #{id}
+	</update>
+	
+	<!-- 逻辑删除，将deleted 改成 0或1 -->
+	<update id="updateFlag" parameterType="User">
+		update WEBPORTAL_USER set
+		<if test="deleted != null  ">
+			IS_DELETED=#{deleted}
+		</if>
+		where ID = #{id}
+	</update>
+	
+	<update id="update" parameterType="User">
+		update WEBPORTAL_USER set LAST_LOGIN_TIME=#{lastLoginTime}, LASTLOGIN_IP=#{lastLoginIp}, CURRENT_LOGIN_TIME=#{currentLoginTime}, CURRENT_LOGIN_IP=#{currentLoginIp} 
+		where ID = #{id}
+	</update>
+	
+	<update id="updateBySelective" parameterType="User">
+		update 
+			WEBPORTAL_USER 
+		<set>
+            <if test="lastLoginTime != null">
+                LAST_LOGIN_TIME = #{lastLoginTime},
+            </if>
+            <if test="lastLoginIp != null">
+                LASTLOGIN_IP = #{lastLoginIp},
+            </if>
+            <if test="oauthId != null">
+                OAUTH_ID = #{oauthId},
+            </if>
+            UPDATE_TIME=now()
+        </set>
+		where 
+			ID = #{id}
+	</update>
+
+	<update id="updatePassword" parameterType="User">
+		update WEBPORTAL_USER set PASSWORD=#{password} 
+		where USERNAME = #{userName}
+	</update>
+	
+	<!-- 根据id查询-->
+	<select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from WEBPORTAL_USER where ID = #{id}
+	</select>
+	
+	<!-- 根据userName查询-->
+	<select id="selectByUserName" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from WEBPORTAL_USER where USERNAME = #{userName}
+	</select>
+	
+	<!-- 根据userName查询用户是否存在-->
+	<select id="existByUserName" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select count(1)
+		from WEBPORTAL_USER where USERNAME = #{userName}
+	</select>
+	
+	<!-- 根据registerDate查询用户列表-->
+	<select id="selectUserByRegisterDate" resultMap="BaseResultMap" parameterType="java.util.Map">
+		select 
+		<include refid="Base_Column_List" /> 
+		from WEBPORTAL_USER where REGISTERDATE between #{startDate} and #{endDate}
+	</select>
+	
+	<!-- 根据条件查询 -->
+	<select id="selectByMap" resultMap="BaseResultMap"
+		parameterType="java.util.Map">
+		select
+		<include refid="Base_Column_List" />
+		from WEBPORTAL_USER 
+		<include refid="Example_Where_Clause" />
+	</select>
+	
+	<select id="selectByOauthId" resultMap="BaseResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from WEBPORTAL_USER where OAUTH_ID = #{oauthId}
+	</select>
+</mapper>   

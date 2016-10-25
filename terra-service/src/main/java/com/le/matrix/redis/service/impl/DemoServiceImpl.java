@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.le.matrix.redis.dao.DemoDao;
-import com.le.matrix.redis.facade.IDemo;
+import com.le.matrix.redis.facade.IDemoService;
 import com.le.matrix.redis.model.Demo;
 import com.letv.common.email.ITemplateMessageSender;
 
@@ -14,7 +14,7 @@ import com.letv.common.email.ITemplateMessageSender;
  * Created by linzhanbo on 2016/10/11.
  */
 @Service("demoService")
-public class DemoServiceImpl implements IDemo {
+public class DemoServiceImpl implements IDemoService {
     private Logger logger = LoggerFactory.getLogger(DemoServiceImpl.class);
 
     @Autowired
@@ -34,7 +34,6 @@ public class DemoServiceImpl implements IDemo {
 
     @Override
     public Demo selectByPrimaryKey(Integer id) {
-    	Integer.parseInt("fdaf");
         logger.debug("Select User：{}", id);
         return userDao.selectByPrimaryKey(id);
     }
