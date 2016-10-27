@@ -18,9 +18,9 @@
 
     <!--使用内置tomcat服务器   可以省去webapp里面内容          !!!与下面二选一-->
     <!--如果直接Main启动/junit启动（一般测试时候用），使用下面配置  -->
-    <!--缺省配置-->
-    <!--<dubbo:protocol name="rest" port="${dubbo.protocol.port.rest}" threads="500" contextpath="services" server="tomcat" accepts="500"
-                    />-->
+    <!--开发环境使用jetty启动，测试及生产环境使用servlet-->
+    <dubbo:protocol name="rest" port="${dubbo.protocol.port.rest}" threads="500" contextpath="services" server="${dubbo.protocol.server}" accepts="500" />
+    
     <!--使用内置tomcat服务器   可以省去webapp里面内容-->
     <!--自定义配置-->
     <!--<dubbo:protocol name="rest" port="${dubbo.protocol.port.rest}" threads="500" contextpath="services" server="tomcat" accepts="500"
@@ -35,7 +35,7 @@
         port：和服务器端口保持一致
         contextpath：和web服务器web.xml定义保持一致
         server：默认servlet，在没有在web服务器中运行的时候，可以写tomcat等由应用启动一个web服务器-->
-    <dubbo:protocol name="rest" accesslog="true" port="${dubbo.protocol.port.rest}" contextpath="services" server="servlet"/>
+    <!-- <dubbo:protocol name="rest" accesslog="true" port="${dubbo.protocol.port.rest}" contextpath="services" server="servlet"/> -->
 
     <!--暴露服务列表-->
     <!--关于service属性配置看http://dubbo.io/User+Guide-zh.htm#UserGuide-zh-%253Cdubbo%253Aservice%252F%253E-->
@@ -52,6 +52,7 @@
            -->
     <dubbo:service interface="com.le.matrix.redis.facade.IDemoService" ref="demoService" validation="true"/>
     <dubbo:service interface="com.le.matrix.redis.facade.ILoginService" ref="loginService" validation="true"/>
+    <dubbo:service interface="com.le.matrix.redis.facade.IRedisService" ref="redisService" validation="true"/>
 
     <!--<dubbo:reference interface="com.xxx.XxxService">
         <dubbo:method name="findXxx" timeout="3000" retries="2" />

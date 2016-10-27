@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.le.matrix.redis.dao.IRedisDao">
+
+	<resultMap id="BaseResultMap" type="Redis">
+	    <result column="ID" property="id" />
+	    <result column="NAME" property="name" />
+	    <result column="TYPE" property="type" jdbcType="TINYINT" typeHandler="com.le.matrix.redis.enumeration.IntValueEnumTypeHandler"/>
+	    <result column="MEMORY_SIZE" property="memorySize" />
+	    <result column="CONFIG_ID" property="configId" />
+	    <result column="IDC_ID" property="idcId" />
+	    <result column="CLUSTER_ID" property="clusterId" />
+	    <result column="PASSWORD" property="password" />
+	    <result column="SERVICE_ID" property="serviceId" />
+	    <result column="DESCN" property="descn" />
+	    <result column="CREATE_TIME" property="createTime" />
+	    <result column="UPDATE_TIME" property="updateTime" />
+	    <result column="CREATE_USER" property="createUser" />
+	    <result column="UPDATE_USER" property="updateUser" />
+	    <result column="DELETED" property="deleted" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.IDC_ID,redis.CLUSTER_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.CREATE_TIME,redis.CREATE_USER
+	</sql>
+	<sql id="All_Column">
+	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.IDC_ID,redis.CLUSTER_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.DELETED,redis.CREATE_TIME,redis.UPDATE_TIME,redis.CREATE_USER,redis.UPDATE_USER
+	</sql>
+	
+	<insert id="insert" parameterType="Redis" useGeneratedKeys="true" keyProperty="id" >
+	    insert into TERRA_REDIS 
+	        (NAME,TYPE,MEMORY_SIZE,CONFIG_ID,IDC_ID,CLUSTER_ID,PASSWORD,SERVICE_ID,DESCN,CREATE_TIME,UPDATE_TIME,CREATE_USER,UPDATE_USER,DELETED) 
+	    values
+	        (#{name},#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
+	         #{memorySize},#{configId},#{idcId},#{clusterId},#{password},#{serviceId},#{descn},#{createTime},#{updateTime},#{createUser},#{updateUser},#{deleted})
+	</insert>
+	
+	<sql id="Common_Where_Clause">
+	    where 1=1
+	    <trim suffixOverrides=",">
+	        <if test="id != null ">
+	            and redis.ID=#{id}
+	        </if>
+	        <if test="name != null ">
+	            and redis.NAME like CONCAT('%',#{name},'%') escape '^'
+	        </if>
+	        <if test="type != null ">
+	            and redis.TYPE=#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+	        </if>
+	        <if test="memorySize != null ">
+	            and redis.MEMORY_SIZE=#{memorySize}
+	        </if>
+	        <if test="configId != null ">
+	            and redis.CONFIG_ID=#{configId}
+	        </if>
+	        <if test="idcId != null ">
+	            and redis.IDC_ID=#{idcId}
+	        </if>
+	        <if test="clusterId != null ">
+	            and redis.CLUSTER_ID=#{clusterId}
+	        </if>
+	        <if test="password != null ">
+	            and redis.PASSWORD=#{password}
+	        </if>
+	        <if test="serviceId != null ">
+	            and redis.SERVICE_ID=#{serviceId}
+	        </if>
+	        <if test="descn != null ">
+	            and redis.DESCN=#{descn}
+	        </if>
+	        <if test="params != null">
+				and redis.DELETED=#{deleted}
+			</if>
+	        <if test="createTime != null ">
+	            and redis.CREATE_TIME=#{createTime}
+	        </if>
+	        <if test="updateTime != null ">
+	            and redis.UPDATE_TIME=#{updateTime}
+	        </if>
+	        <if test="createUser != null ">
+	            and redis.CREATE_USER=#{createUser}
+	        </if>
+	        <if test="updateUser != null ">
+	            and redis.UPDATE_USER=#{updateUser}
+	        </if>
+	    </trim>
+	</sql>
+	
+	<delete id="delete" parameterType="Redis">
+		delete from TERRA_REDIS where ID = #{id}
+	</delete>
+	
+	<select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map">
+	    select
+	        <include refid="Base_Column_List" />
+	    from
+	        TERRA_REDIS redis
+	        <include refid="Common_Where_Clause" />
+	</select>
+	
+	<!-- 列表总数 -->
+	<select id="selectByMapCount" resultType="java.lang.Integer" parameterType="com.letv.common.dao.QueryParam">
+		select 
+			count(1) 
+		from 
+			TERRA_REDIS redis
+			<include refid="Page_Where_Clause" />
+	</select>
+	
+	<!-- 分页：根据条件查询 -->
+	<select id="selectPageByMap" resultMap="BaseResultMap" parameterType="com.letv.common.dao.QueryParam">
+		select
+			<include refid="Base_Column_List" />
+		from 
+			TERRA_REDIS redis
+			<include refid="Page_Where_Clause" />
+		ORDER BY redis.CREATE_TIME DESC
+			<if test="page != null">
+	      		limit #{page.startRowPosition},#{page.recordsPerPage}
+	    	</if>
+	</select>
+	
+	<sql id="Page_Where_Clause">
+		where 1=1
+		<trim suffixOverrides=",">
+			<if test="params != null and params.id != null  ">
+				and redis.ID=#{params.id}
+			</if>
+			<if test="params != null and params.name != null and params.name != '' ">
+				and redis.NAME like CONCAT('%',#{params.name},'%') escape '^'
+			</if>
+			<if test="params != null and params.idcId != null  ">
+				and redis.IDC_ID=#{params.idcId}
+			</if>
+			<if test="params != null and params.clusterId != null  ">
+				and redis.CLUSTER_ID=#{params.clusterId}
+			</if>
+			<if test="params != null and params.type != null and params.type != ''  ">
+				and redis.TYPE=#{params.type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+			</if>
+			<if test="params != null and params.descn != null and params.descn != ''  ">
+				and redis.DESCN=#{params.descn}
+			</if>
+			<if test="params != null and params.deleted != null and params.deleted != ''  ">
+				and redis.DELETED=#{params.deleted}
+			</if>
+			<if test="params != null and params.createTime != null  ">
+				and redis.CREATE_TIME=#{params.createTime}
+			</if>
+			<if test="params != null and params.createUser != null  ">
+				and redis.CREATE_USER=#{params.createUser}
+			</if>
+			<if test="params != null and params.updateTime != null  ">
+				and redis.UPDATE_TIME=#{params.updateTime}
+			</if>
+			<if test="params != null and params.updateUser != null  ">
+				and redis.UPDATE_USER=#{params.updateUser}
+			</if>
+		</trim>
+	</sql>
+</mapper>   

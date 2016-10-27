@@ -3,6 +3,8 @@ package com.le.matrix.redis.facade;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.POST;
+
 import com.letv.common.paging.impl.Page;
 
 public interface IBaseService<T> {
@@ -28,6 +30,7 @@ public interface IBaseService<T> {
 	 * @return
 	 * @throws Exception
 	 */
+	@POST
 	void insert(T t);
 
 	/**
