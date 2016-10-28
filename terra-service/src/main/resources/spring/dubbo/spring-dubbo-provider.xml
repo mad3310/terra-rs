@@ -53,6 +53,8 @@
     <dubbo:service interface="com.le.matrix.redis.facade.IDemoService" ref="demoService" validation="true"/>
     <dubbo:service interface="com.le.matrix.redis.facade.ILoginService" ref="loginService" validation="true"/>
     <dubbo:service interface="com.le.matrix.redis.facade.IRedisService" ref="redisService" validation="true"/>
+    <dubbo:service interface="com.le.matrix.redis.facade.IQuotaBaseService" ref="quotaBaseService" validation="true"/>
+    <dubbo:service interface="com.le.matrix.redis.facade.IQuotaUserService" ref="quotaUserService" validation="true"/>
 
     <!--<dubbo:reference interface="com.xxx.XxxService">
         <dubbo:method name="findXxx" timeout="3000" retries="2" />
