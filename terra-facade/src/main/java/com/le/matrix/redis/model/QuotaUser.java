@@ -8,9 +8,18 @@ public class QuotaUser extends BaseModel {
 
 	private Long used;//使用量
 
+	private Long quotaBaseId;//基础配额id
     private QuotaBase QuotaBase;//基础配额
 
     private String descn;
+
+	public Long getQuotaBaseId() {
+		return quotaBaseId;
+	}
+
+	public void setQuotaBaseId(Long quotaBaseId) {
+		this.quotaBaseId = quotaBaseId;
+	}
 
 	public Long getUsed() {
 		return used;

@@ -4,6 +4,7 @@
 	<resultMap id="BaseResultMap" type="com.le.matrix.redis.model.QuotaUser">
 		<id column="ID" jdbcType="BIGINT" property="id" />
 		<result column="USED" jdbcType="BIGINT" property="used" />
+		<result column="QUOTA_BASE_ID" jdbcType="BIGINT" property="quotaBaseId" />
 		<result column="DESCN" jdbcType="VARCHAR" property="descn" />
 		<result column="DELETED" jdbcType="TINYINT" property="deleted" />
 		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
@@ -18,31 +19,64 @@
 		</association>
 	</resultMap>
 	<sql id="Base_Column_List">
-		ID, USED, QUOTA_BASE_ID, DESCN, DELETED, CREATE_TIME,
-		UPDATE_TIME,
-		CREATE_USER, UPDATE_USER
+		quotaUser.ID, quotaUser.USED, quotaUser.QUOTA_BASE_ID, quotaUser.DESCN, quotaUser.DELETED, quotaUser.CREATE_TIME,
+		quotaUser.UPDATE_TIME,
+		quotaUser.CREATE_USER, quotaUser.UPDATE_USER
+	</sql>
+	
+	<sql id="Common_Where_Clause">
+	    where 1=1
+	    <trim suffixOverrides=",">
+	        <if test="id != null ">
+	            and quotaUser.ID=#{id}
+	        </if>
+	        <if test="used != null ">
+	            and quotaUser.USED=#{used}
+	        </if>
+	        <if test="quotaBaseId != null ">
+	            and quotaUser.QUOTA_BASE_ID=#{quotaBaseId}
+	        </if>
+	        <if test="descn != null ">
+	            and quotaUser.DESCN=#{descn}
+	        </if>
+	        <if test="deleted != null ">
+	            and quotaUser.DELETED=#{deleted}
+	        </if>
+	        <if test="createTime != null ">
+	            and quotaUser.CREATE_TIME=#{createTime}
+	        </if>
+	        <if test="updateTime != null ">
+	            and quotaUser.UPDATE_TIME=#{updateTime}
+	        </if>
+	        <if test="createUser != null ">
+	            and quotaUser.CREATE_USER=#{createUser}
+	        </if>
+	        <if test="updateUser != null ">
+	            and quotaUser.UPDATE_USER=#{updateUser}
+	        </if>
+	    </trim>
 	</sql>
 	<select id="selectById" parameterType="java.lang.Long"
 		resultMap="BaseResultMap">
 		select
 			<include refid="Base_Column_List" />
 		from 
-			TERRA_QUOTA_USER
-		where ID = #{id,jdbcType=BIGINT}
+			TERRA_QUOTA_USER quotaUser
+		where quotaUser.ID = #{id,jdbcType=BIGINT}
 	</select>
 	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
 		delete from
 		TERRA_QUOTA_USER
 		where ID = #{id,jdbcType=BIGINT}
 	</delete>
-	<insert id="insert" parameterType="com.le.matrix.redis.model.QuotaUser">
+	<insert id="insert" parameterType="com.le.matrix.redis.model.QuotaUser" useGeneratedKeys="true" keyProperty="id">
 		insert into TERRA_QUOTA_USER
-			(ID, USED, QUOTA_BASE_ID,
+			(USED, QUOTA_BASE_ID,
 			DESCN, DELETED, CREATE_TIME,
 			UPDATE_TIME,
 			CREATE_USER, UPDATE_USER
 			)
-		values (#{id,jdbcType=BIGINT},
+		values (
 			#{used,jdbcType=BIGINT},
 			#{quotaBaseId,jdbcType=BIGINT},
 			#{descn,jdbcType=VARCHAR}, #{deleted,jdbcType=TINYINT},
@@ -157,4 +191,20 @@
 			UPDATE_USER = #{updateUser,jdbcType=BIGINT}
 		where ID = #{id,jdbcType=BIGINT}
 	</update>
+	
+	<select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map">
+	    select
+	        <include refid="Base_Column_List" />,quotaBase.NAME,quotaBase.TYPE,quotaBase.VALUE
+	    from
+	        TERRA_QUOTA_USER quotaUser
+	    join
+	    	TERRA_QUOTA_BASE quotaBase on quotaUser.QUOTA_BASE_ID=quotaBase.ID
+	        <include refid="Common_Where_Clause" />
+	        <if test="name != null ">
+				and quotaBase.NAME = #{name}
+			</if>
+	        <if test="type != null ">
+				and quotaBase.TYPE = #{type}
+			</if>
+	</select>
 </mapper>

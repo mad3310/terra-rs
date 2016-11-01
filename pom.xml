@@ -13,6 +13,31 @@
     </modules>
     
     <profiles>
+    	<profile>
+	        <id>junit</id>
+	        <properties>
+	            <db.url>jdbc:mysql://10.204.29.161:3306/paascloud_test?useUnicode=true&amp;characterEncoding=utf-8</db.url>
+	            <db.username>webportal</db.username>
+	            <db.password>H6ZMvaimaKGyrwRb4u7tAIjTTGflemmWySrZwT/lt51IkVR7+WrwhNdAZcnO4WjQJp6NH2KO1++qjblh8Y12fg==</db.password>
+	
+				<dubbo.registry.zkAddr>127.0.0.1:2181</dubbo.registry.zkAddr>
+				<dubbo.protocol.server>tomcat</dubbo.protocol.server>
+				
+	            <terra.portal.http>http://127.0.0.1:8081</terra.portal.http>
+	            <oauth.auth.http>https://login.lecloud.com</oauth.auth.http>
+	
+	            <webportal.errormail.to>lisuxiao@le.com</webportal.errormail.to>
+	            <service.notice.email.to>lisuxiao@le.com</service.notice.email.to>
+	            <service.operation.notice.email.to>lisuxiao@le.com</service.operation.notice.email.to>
+	            <start.timing.jobs>N</start.timing.jobs>
+	
+	            <webportal.log.path>D:</webportal.log.path>
+	
+	            <task.executor.size>30</task.executor.size>
+	
+	            <com.letv.cache.implStyle>Local</com.letv.cache.implStyle>
+	        </properties>
+	    </profile>
 	    <profile>
 	        <id>local</id>
 	        <activation>

@@ -23,4 +23,7 @@ public class QuotaUserServiceImpl extends BaseServiceImpl<QuotaUser> implements 
 		return quotaUserDao;
 	}
 
+	public void deleteByPrimaryKey(Long id) {
+		quotaUserDao.deleteByPrimaryKey(id);
+	}
 }

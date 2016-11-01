@@ -59,7 +59,7 @@ public interface IBaseService<T> {
 	 * @return
 	 * @throws Exception
 	 */
-	@GET()
+	@GET
 	@Path("{id : \\d+}")
 	T selectById(@PathParam("id") Long id);
 
@@ -97,6 +97,8 @@ public interface IBaseService<T> {
 	 * @return
 	 * @throws Exception
 	 */
+	@POST
+	@Path("selective")
 	<K, V> List<T> selectByMap(Map<K, V> map);
 
 	public boolean hasSoftDelete();

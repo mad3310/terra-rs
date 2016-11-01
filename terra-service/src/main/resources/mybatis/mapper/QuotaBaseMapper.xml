@@ -63,14 +63,14 @@
 		delete from TERRA_QUOTA_BASE
 		where ID = #{id,jdbcType=BIGINT}
 	</delete>
-	<insert id="insert" parameterType="com.le.matrix.redis.model.QuotaBase">
+	<insert id="insert" parameterType="com.le.matrix.redis.model.QuotaBase" useGeneratedKeys="true" keyProperty="id">
 		insert into TERRA_QUOTA_BASE 
-			(ID, NAME, TYPE,
+			(NAME, TYPE,
 			VALUE, DESCN, DELETED,
 			CREATE_TIME, UPDATE_TIME, CREATE_USER,
 			UPDATE_USER)
 		values 
-			(#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR},
+			(#{name,jdbcType=VARCHAR},
 			#{type,jdbcType=VARCHAR},
 			#{value,jdbcType=BIGINT}, #{descn,jdbcType=VARCHAR}, #{deleted,jdbcType=TINYINT},
 			#{createTime,jdbcType=TIMESTAMP}, #{updateTime,jdbcType=TIMESTAMP},

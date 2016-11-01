@@ -33,5 +33,9 @@ public class QuotaBaseServiceImpl extends BaseServiceImpl<QuotaBase> implements 
 		params.put("name", productName);
 		return this.quotaBaseDao.selectByMap(params);
 	}
+	
+	public void deleteByPrimaryKey(Long id) {
+		quotaBaseDao.deleteByPrimaryKey(id);
+	}
 
 }
