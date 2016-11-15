@@ -1,5 +1,8 @@
 package com.le.matrix.redis.model;
 
+import java.util.Date;
+
+import com.le.matrix.redis.enumeration.AuditStatus;
 import com.le.matrix.redis.enumeration.RedisType;
 import com.letv.common.model.BaseModel;
 
@@ -23,10 +26,53 @@ public class Redis extends BaseModel {
 
 	private String serviceId;//服务id
 	
+	private AuditStatus auditStatus;//审核状态
+	
+	private String auditInfo;//审核信息
+	
+	private Date auditTime;//审核时间
+	
+	private Long auditUser;//审核人
+	
 	private String descn;//描述
 
 	public Redis() {
 	}
+
+	public AuditStatus getAuditStatus() {
+		return auditStatus;
+	}
+
+	public void setAuditStatus(AuditStatus auditStatus) {
+		this.auditStatus = auditStatus;
+	}
+
+	public String getAuditInfo() {
+		return auditInfo;
+	}
+
+	public void setAuditInfo(String auditInfo) {
+		this.auditInfo = auditInfo;
+	}
+
+	public Date getAuditTime() {
+		return auditTime;
+	}
+
+	public void setAuditTime(Date auditTime) {
+		this.auditTime = auditTime;
+	}
+
+
+	public Long getAuditUser() {
+		return auditUser;
+	}
+
+
+	public void setAuditUser(Long auditUser) {
+		this.auditUser = auditUser;
+	}
+
 
 	public String getDescn() {
 		return descn;

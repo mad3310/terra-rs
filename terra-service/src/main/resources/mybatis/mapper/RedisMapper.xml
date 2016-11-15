@@ -19,22 +19,31 @@
 	    <result column="UPDATE_TIME" property="updateTime" />
 	    <result column="CREATE_USER" property="createUser" />
 	    <result column="UPDATE_USER" property="updateUser" />
+	    <result column="AUDIT_STATUS" property="auditStatus" />
+	    <result column="AUDIT_INFO" property="auditInfo" />
+	    <result column="AUDIT_TIME" property="auditTime" />
+	    <result column="AUDIT_USER" property="auditUser" />
 	    <result column="DELETED" property="deleted" />
 	</resultMap>
 	
 	<sql id="Base_Column_List">
 	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.IDC_ID,redis.CLUSTER_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.CREATE_TIME,redis.CREATE_USER
+	    ,redis.AUDIT_STATUS,redis.AUDIT_INFO,redis.AUDIT_TIME,redis.AUDIT_USER
 	</sql>
 	<sql id="All_Column">
 	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.IDC_ID,redis.CLUSTER_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.DELETED,redis.CREATE_TIME,redis.UPDATE_TIME,redis.CREATE_USER,redis.UPDATE_USER
+		,redis.AUDIT_STATUS,redis.AUDIT_INFO,redis.AUDIT_TIME,redis.AUDIT_USER
 	</sql>
 	
 	<insert id="insert" parameterType="Redis" useGeneratedKeys="true" keyProperty="id" >
 	    insert into TERRA_REDIS 
-	        (NAME,TYPE,MEMORY_SIZE,CONFIG_ID,IDC_ID,CLUSTER_ID,PASSWORD,SERVICE_ID,DESCN,CREATE_TIME,UPDATE_TIME,CREATE_USER,UPDATE_USER,DELETED) 
+	        (NAME,TYPE,MEMORY_SIZE,CONFIG_ID,IDC_ID,CLUSTER_ID,PASSWORD,SERVICE_ID,DESCN,CREATE_TIME,UPDATE_TIME,CREATE_USER,UPDATE_USER,DELETED
+	        ,AUDIT_STATUS,AUDIT_INFO,AUDIT_TIME,AUDIT_USER) 
 	    values
 	        (#{name},#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
-	         #{memorySize},#{configId},#{idcId},#{clusterId},#{password},#{serviceId},#{descn},#{createTime},#{updateTime},#{createUser},#{updateUser},#{deleted})
+	         #{memorySize},#{configId},#{idcId},#{clusterId},#{password},#{serviceId},#{descn},#{createTime},#{updateTime},#{createUser},#{updateUser},#{deleted}
+	         ,#{auditStatus,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+	         ,#{auditInfo},#{auditTime},#{auditUser})
 	</insert>
 	
 	<sql id="Common_Where_Clause">
@@ -85,8 +94,81 @@
 	        <if test="updateUser != null ">
 	            and redis.UPDATE_USER=#{updateUser}
 	        </if>
+	        <if test="auditStatus != null ">
+	            and redis.AUDIT_STATUS=#{auditStatus,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+	        </if>
+	        <if test="auditInfo != null ">
+	            and redis.AUDIT_INFO=#{auditInfo}
+	        </if>
+	        <if test="auditTime != null ">
+	            and redis.AUDIT_TIME=#{auditTime}
+	        </if>
+	        <if test="auditUser != null ">
+	            and redis.AUDIT_USER=#{auditUser}
+	        </if>
 	    </trim>
 	</sql>
+	
+	<update id="updateBySelective" parameterType="Redis">
+		update TERRA_REDIS
+		<set>
+			 <if test="name != null ">
+	           NAME = #{name},
+	        </if>
+	        <if test="type != null ">
+	            TYPE=#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
+	        </if>
+	        <if test="memorySize != null ">
+	            MEMORY_SIZE=#{memorySize},
+	        </if>
+	        <if test="configId != null ">
+	            CONFIG_ID=#{configId},
+	        </if>
+	        <if test="idcId != null ">
+	            IDC_ID=#{idcId},
+	        </if>
+	        <if test="clusterId != null ">
+	            CLUSTER_ID=#{clusterId},
+	        </if>
+	        <if test="password != null ">
+	            PASSWORD=#{password},
+	        </if>
+	        <if test="serviceId != null ">
+	            SERVICE_ID=#{serviceId},
+	        </if>
+	        <if test="descn != null ">
+	            DESCN=#{descn},
+	        </if>
+	        <if test="params != null">
+				DELETED=#{deleted},
+			</if>
+	        <if test="createTime != null ">
+	            CREATE_TIME=#{createTime},
+	        </if>
+	        <if test="updateTime != null ">
+	            UPDATE_TIME=#{updateTime},
+	        </if>
+	        <if test="createUser != null ">
+	            CREATE_USER=#{createUser},
+	        </if>
+	        <if test="updateUser != null ">
+	            UPDATE_USER=#{updateUser},
+	        </if>
+	        <if test="auditStatus != null ">
+	            AUDIT_STATUS=#{auditStatus,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
+	        </if>
+	        <if test="auditInfo != null ">
+	            AUDIT_INFO=#{auditInfo},
+	        </if>
+	        <if test="auditTime != null ">
+	            AUDIT_TIME=#{auditTime},
+	        </if>
+	        <if test="auditUser != null ">
+	            AUDIT_USER=#{auditUser},
+	        </if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
 	
 	<delete id="delete" parameterType="Redis">
 		delete from TERRA_REDIS where ID = #{id}
@@ -157,6 +239,18 @@
 			</if>
 			<if test="params != null and params.updateUser != null  ">
 				and redis.UPDATE_USER=#{params.updateUser}
+			</if>
+			<if test="params != null and params.auditStatus != null and params.auditStatus != ''  ">
+				and redis.AUDIT_STATUS=#{params.auditStatus,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+			</if>
+			<if test="params != null and params.auditInfo != null and params.auditInfo != ''  ">
+				and redis.AUDIT_INFO=#{params.auditInfo}
+			</if>
+			<if test="params != null and params.auditTime != null and params.auditTime != ''  ">
+				and redis.AUDIT_TIME=#{params.auditTime}
+			</if>
+			<if test="params != null and params.auditUser != null  ">
+				and redis.AUDIT_USER=#{params.auditUser}
 			</if>
 		</trim>
 	</sql>
