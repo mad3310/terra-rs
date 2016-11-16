@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.le.matrix.redis.constant.Constant;
 import com.le.matrix.redis.model.RESTfulResult;
@@ -25,6 +24,12 @@ public class RedisHttpClient {
 	
 	public static ApiResultObject postObject(String url, Object obj) {
 		RESTfulResult restfulResult = StatusHttpClient.postObject(url, obj, Constant.CONNECTION_TIMEOUT, 
+				Constant.SO_TIMEOUT, getHttpHeader());
+		return analyzeHttpStatusRESTfulResult(restfulResult);
+	}
+	
+	public static ApiResultObject post(String url, Map<String, String> params) {
+		RESTfulResult restfulResult = StatusHttpClient.post(url, params, Constant.CONNECTION_TIMEOUT, 
 				Constant.SO_TIMEOUT, getHttpHeader());
 		return analyzeHttpStatusRESTfulResult(restfulResult);
 	}
@@ -67,7 +72,7 @@ public class RedisHttpClient {
 		//业务逻辑检查,返回的code=200时,任务业务逻辑成功
 		if(HttpStatus.OK.value() == (Integer)resultMap.get("code")) {
 			aipResultObject.setAnalyzeResult(true);
-			aipResultObject.setResult(((JSONArray)resultMap.get("data")).toJSONString());
+			aipResultObject.setResult(JSONObject.toJSONString(resultMap.get("data")));
 		} else {
 			aipResultObject.setAnalyzeResult(false);
 			aipResultObject.setResult((String)resultMap.get("message"));
