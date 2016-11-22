@@ -1,7 +1,7 @@
 package com.le.matrix.redis.enumeration;
 
 public enum RedisType implements IntEnum{
-	RedisCluster(1);
+	RedisCluster(2);
 	
 	private final Integer value;
 	

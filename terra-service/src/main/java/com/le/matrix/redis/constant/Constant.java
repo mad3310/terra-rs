@@ -16,5 +16,10 @@ public class Constant {
 	public final static long CHECK_INTERVAL_TIME = 3000;
 	//restful结果标志
 	public final static String RESTFUL_RESULT_MARK = "true";
+	
+	//配额redis名称
+	public static final String QUOTA_REDIS_NAME = "REDIS";
+	//配额redis 类型
+	public static final String QUOTA_REDIS_TYPE = "num";
 
 }

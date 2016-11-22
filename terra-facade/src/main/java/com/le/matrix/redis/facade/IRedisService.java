@@ -1,5 +1,7 @@
 package com.le.matrix.redis.facade;
 
+import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -64,7 +66,7 @@ public interface IRedisService extends IBaseService<Redis> {
 	 * @return
 	 */
 	@GET
-	@Path("/{id}")
+	@Path("/instance/{id}")
 	ApiResultObject getInfoById(@PathParam("id") Long id);
 	
 	/**
@@ -97,5 +99,38 @@ public interface IRedisService extends IBaseService<Redis> {
 	 */
 	@POST
 	@Path("/create")
-	ApiResultObject create(Redis redis);
+	ApiResultObject createInstance(Map<String, String> params);
+	
+	/**
+	 * 检查并调用工作流
+	 * @param redis
+	 * @return
+	 */
+	@POST
+	@Path("/build")
+	void build(Redis redis);
+	
+	/**
+	 * 审核并调用工作流
+	 * @param redis
+	 * @param auditInfo
+	 * @param auditUser
+	 */
+	@GET
+	@Path("/audit")
+	void auditAndBuild(Redis redis, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
+	
+	/**
+	 * 驳回
+	 * @param redis
+	 * @param auditInfo
+	 * @param auditUser
+	 */
+	@GET
+	@Path("/reject")
+	void reject(Redis redis, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
+	
+	@GET
+	@Path("/instance")
+	ApiResultObject updateServiceIdById(@QueryParam("serviceId") String serviceId, @QueryParam("id") Long id);
 }

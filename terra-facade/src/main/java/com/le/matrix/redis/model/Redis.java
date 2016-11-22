@@ -18,8 +18,6 @@ public class Redis extends BaseModel {
 
 	private String configId;//配置文件id
 
-	private String idcId;//机房id
-
 	private String clusterId;//集群id
 
 	private String password;//密码
@@ -112,14 +110,6 @@ public class Redis extends BaseModel {
 
 	public void setConfigId(String configId) {
 		this.configId = configId;
-	}
-
-	public String getIdcId() {
-		return idcId;
-	}
-
-	public void setIdcId(String idcId) {
-		this.idcId = idcId;
 	}
 
 	public String getClusterId() {

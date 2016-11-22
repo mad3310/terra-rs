@@ -10,7 +10,6 @@
 	    <result column="TYPE" property="type" jdbcType="TINYINT" typeHandler="com.le.matrix.redis.enumeration.IntValueEnumTypeHandler"/>
 	    <result column="MEMORY_SIZE" property="memorySize" />
 	    <result column="CONFIG_ID" property="configId" />
-	    <result column="IDC_ID" property="idcId" />
 	    <result column="CLUSTER_ID" property="clusterId" />
 	    <result column="PASSWORD" property="password" />
 	    <result column="SERVICE_ID" property="serviceId" />
@@ -27,21 +26,21 @@
 	</resultMap>
 	
 	<sql id="Base_Column_List">
-	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.IDC_ID,redis.CLUSTER_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.CREATE_TIME,redis.CREATE_USER
+	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.CLUSTER_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.CREATE_TIME,redis.CREATE_USER
 	    ,redis.AUDIT_STATUS,redis.AUDIT_INFO,redis.AUDIT_TIME,redis.AUDIT_USER
 	</sql>
 	<sql id="All_Column">
-	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.IDC_ID,redis.CLUSTER_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.DELETED,redis.CREATE_TIME,redis.UPDATE_TIME,redis.CREATE_USER,redis.UPDATE_USER
+	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.CLUSTER_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.DELETED,redis.CREATE_TIME,redis.UPDATE_TIME,redis.CREATE_USER,redis.UPDATE_USER
 		,redis.AUDIT_STATUS,redis.AUDIT_INFO,redis.AUDIT_TIME,redis.AUDIT_USER
 	</sql>
 	
 	<insert id="insert" parameterType="Redis" useGeneratedKeys="true" keyProperty="id" >
 	    insert into TERRA_REDIS 
-	        (NAME,TYPE,MEMORY_SIZE,CONFIG_ID,IDC_ID,CLUSTER_ID,PASSWORD,SERVICE_ID,DESCN,CREATE_TIME,UPDATE_TIME,CREATE_USER,UPDATE_USER,DELETED
+	        (NAME,TYPE,MEMORY_SIZE,CONFIG_ID,CLUSTER_ID,PASSWORD,SERVICE_ID,DESCN,CREATE_TIME,UPDATE_TIME,CREATE_USER,UPDATE_USER,DELETED
 	        ,AUDIT_STATUS,AUDIT_INFO,AUDIT_TIME,AUDIT_USER) 
 	    values
 	        (#{name},#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
-	         #{memorySize},#{configId},#{idcId},#{clusterId},#{password},#{serviceId},#{descn},#{createTime},#{updateTime},#{createUser},#{updateUser},#{deleted}
+	         #{memorySize},#{configId},#{clusterId},#{password},#{serviceId},#{descn},#{createTime},#{updateTime},#{createUser},#{updateUser},#{deleted}
 	         ,#{auditStatus,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
 	         ,#{auditInfo},#{auditTime},#{auditUser})
 	</insert>
@@ -64,9 +63,6 @@
 	        <if test="configId != null ">
 	            and redis.CONFIG_ID=#{configId}
 	        </if>
-	        <if test="idcId != null ">
-	            and redis.IDC_ID=#{idcId}
-	        </if>
 	        <if test="clusterId != null ">
 	            and redis.CLUSTER_ID=#{clusterId}
 	        </if>
@@ -79,7 +75,7 @@
 	        <if test="descn != null ">
 	            and redis.DESCN=#{descn}
 	        </if>
-	        <if test="params != null">
+	        <if test="deleted != null">
 				and redis.DELETED=#{deleted}
 			</if>
 	        <if test="createTime != null ">
@@ -124,9 +120,6 @@
 	        <if test="configId != null ">
 	            CONFIG_ID=#{configId},
 	        </if>
-	        <if test="idcId != null ">
-	            IDC_ID=#{idcId},
-	        </if>
 	        <if test="clusterId != null ">
 	            CLUSTER_ID=#{clusterId},
 	        </if>
@@ -139,7 +132,7 @@
 	        <if test="descn != null ">
 	            DESCN=#{descn},
 	        </if>
-	        <if test="params != null">
+	        <if test="deleted != null">
 				DELETED=#{deleted},
 			</if>
 	        <if test="createTime != null ">
@@ -212,9 +205,6 @@
 			</if>
 			<if test="params != null and params.name != null and params.name != '' ">
 				and redis.NAME like CONCAT('%',#{params.name},'%') escape '^'
-			</if>
-			<if test="params != null and params.idcId != null  ">
-				and redis.IDC_ID=#{params.idcId}
 			</if>
 			<if test="params != null and params.clusterId != null  ">
 				and redis.CLUSTER_ID=#{params.clusterId}

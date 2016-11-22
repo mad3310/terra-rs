@@ -147,7 +147,7 @@
 			</if>
 		</trim>
 	</insert>
-	<update id="updateByPrimaryKeySelective" parameterType="com.le.matrix.redis.model.QuotaUser">
+	<update id="updateBySelective" parameterType="com.le.matrix.redis.model.QuotaUser">
 		update TERRA_QUOTA_USER
 		<set>
 			<if test="used != null">

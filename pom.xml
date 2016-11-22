@@ -28,6 +28,7 @@
 	
 	            <webportal.errormail.to>lisuxiao@le.com</webportal.errormail.to>
 	            <service.notice.email.to>lisuxiao@le.com</service.notice.email.to>
+	            <redis.audit.email.to>lisuxiao@le.com</redis.audit.email.to>
 	            <service.operation.notice.email.to>lisuxiao@le.com</service.operation.notice.email.to>
 	            <start.timing.jobs>N</start.timing.jobs>
 	
@@ -56,6 +57,7 @@
 	
 	            <webportal.errormail.to>lisuxiao@le.com</webportal.errormail.to>
 	            <service.notice.email.to>lisuxiao@le.com</service.notice.email.to>
+	            <redis.audit.email.to>lisuxiao@le.com</redis.audit.email.to>
 	            <service.operation.notice.email.to>lisuxiao@le.com</service.operation.notice.email.to>
 	            <start.timing.jobs>N</start.timing.jobs>
 	
@@ -63,7 +65,7 @@
 	
 	            <task.executor.size>30</task.executor.size>
 	
-	            <com.letv.cache.implStyle>Local</com.letv.cache.implStyle>
+	            <com.letv.cache.implStyle>Remote</com.letv.cache.implStyle>
 	
 	        </properties>
 	    </profile>
@@ -83,6 +85,7 @@
 	
 	            <webportal.errormail.to>lisuxiao@le.com;linzhanbo@le.com;sunweiwei1@le.com;zhangtao8@le.com</webportal.errormail.to>
 	            <service.notice.email.to>lisuxiao@le.com;linzhanbo@le.com;sunweiwei1@le.com;zhangtao8@le.com</service.notice.email.to>
+	            <redis.audit.email.to>lisuxiao@le.com</redis.audit.email.to>
 	            <service.operation.notice.email.to>lisuxiao@le.com;linzhanbo@le.com;sunweiwei1@le.com;zhangtao8@le.com</service.operation.notice.email.to>
 	            <start.timing.jobs>N</start.timing.jobs>
 	
@@ -110,6 +113,7 @@
 	            <!-- 使用邮件组无法识别，暂时使用邮箱名 -->
 	            <webportal.errormail.to>lisuxiao@le.com;linzhanbo@le.com;zhoubingzheng@le.com;</webportal.errormail.to>
 	            <service.notice.email.to>lisuxiao@le.com;linzhanbo@le.com;liujinliu@le.com;zhoubingzheng@le.com;wulicheng@le.com;gaoqiang3@le.com;zhangchengqiang@le.com</service.notice.email.to>
+	            <redis.audit.email.to>lisuxiao@le.com</redis.audit.email.to>
 	            <service.operation.notice.email.to>zhoubingzheng@le.com;gaoqiang3@le.com;zhangchengqiang@le.com</service.operation.notice.email.to>
 	            <start.timing.jobs>N</start.timing.jobs>
 	

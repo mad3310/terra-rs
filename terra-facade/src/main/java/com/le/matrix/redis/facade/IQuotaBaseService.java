@@ -19,10 +19,10 @@ import com.le.matrix.redis.model.QuotaBase;
 public interface IQuotaBaseService extends IBaseService<QuotaBase> {
 	
 	@GET
-	@Path("{productName}/default")
-	List<QuotaBase> getDefaultQuotaByProductName(@PathParam("productName") String productName);
+	@Path("{productName}/{type}/default")
+	List<QuotaBase> getDefaultQuotaByProductNameAndType(@PathParam("productName") String productName, @PathParam("type") String type);
 	
 	@DELETE
 	@Path("{id : \\d+}")
-	void deleteByPrimaryKey(@PathParam("productName") Long id);
+	void deleteByPrimaryKey(@PathParam("id") Long id);
 }

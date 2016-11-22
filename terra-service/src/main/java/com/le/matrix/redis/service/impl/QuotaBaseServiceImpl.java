@@ -28,9 +28,10 @@ public class QuotaBaseServiceImpl extends BaseServiceImpl<QuotaBase> implements 
 	}
 
 	@Override
-	public List<QuotaBase> getDefaultQuotaByProductName(String productName) {
+	public List<QuotaBase> getDefaultQuotaByProductNameAndType(String productName, String type) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("name", productName);
+		params.put("type", type);
 		return this.quotaBaseDao.selectByMap(params);
 	}
 	
