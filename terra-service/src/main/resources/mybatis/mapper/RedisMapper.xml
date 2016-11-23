@@ -18,7 +18,7 @@
 	    <result column="UPDATE_TIME" property="updateTime" />
 	    <result column="CREATE_USER" property="createUser" />
 	    <result column="UPDATE_USER" property="updateUser" />
-	    <result column="AUDIT_STATUS" property="auditStatus" />
+	    <result column="AUDIT_STATUS" property="auditStatus" jdbcType="TINYINT" typeHandler="com.le.matrix.redis.enumeration.IntValueEnumTypeHandler"/>
 	    <result column="AUDIT_INFO" property="auditInfo" />
 	    <result column="AUDIT_TIME" property="auditTime" />
 	    <result column="AUDIT_USER" property="auditUser" />

@@ -73,7 +73,7 @@ public class QuotaServiceTest extends AbstractTest{
     }
     private void checkQuotaBaseDefaultSize(QuotaBase qb) {
     	//根据名称查询size
-    	List<QuotaBase> qbs = quotaBaseService.getDefaultQuotaByProductName(qb.getName());
+    	List<QuotaBase> qbs = quotaBaseService.getDefaultQuotaByProductNameAndType(qb.getName(), qb.getType());
     	Assert.assertEquals(1, qbs.size());
     }
   

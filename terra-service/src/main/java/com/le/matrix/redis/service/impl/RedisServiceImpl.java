@@ -1,6 +1,7 @@
 package com.le.matrix.redis.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ import com.letv.common.dao.IBaseDao;
 import com.letv.common.email.ITemplateMessageSender;
 import com.letv.common.email.bean.MailMessage;
 import com.letv.common.exception.ValidateException;
+import com.letv.common.paging.impl.Page;
 import com.letv.common.result.ApiResultObject;
 
 @Service("redisService")
@@ -61,6 +63,36 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	@Override
 	public IBaseDao<Redis> getDao() {
 		return redisDao;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <K, V> Page queryByPagination(Page page, Map<K, V> params) {
+		Page p = super.queryByPagination(page, params);
+		List<Redis> rediss = (List<Redis>) p.getData();
+		List<Map<String, Object>> rets = new ArrayList<Map<String, Object>>();
+		for (Redis redis : rediss) {
+			Map<String, Object> ret = new HashMap<String, Object>();
+			rets.add(ret);
+			if(StringUtils.isNotEmpty(redis.getServiceId())) {
+				ApiResultObject apiResult = this.getInfoById(Long.parseLong(redis.getServiceId()));
+				List<Object> instances = JSONObject.parseArray(apiResult.getResult());
+				Map<String, Object> instance = (Map<String, Object>) instances.get(0);
+				ret.put("name", instance.get("name"));
+				ret.put("status", instance.get("status"));
+				ret.put("type", redis.getType());
+				ret.put("memorySize", instance.get("memSize"));
+				ret.put("createTime", instance.get("createTime"));
+			} else {
+				ret.put("name", redis.getName());
+				ret.put("status", redis.getAuditStatus().getValue());
+				ret.put("type", redis.getType());
+				ret.put("memorySize", redis.getMemorySize());
+				ret.put("createTime", redis.getCreateTime());
+			}
+		}
+		p.setData(rets);
+		return p;
 	}
 	
 	@Override
