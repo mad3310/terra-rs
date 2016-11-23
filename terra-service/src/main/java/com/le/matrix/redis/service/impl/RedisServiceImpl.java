@@ -100,6 +100,12 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+"/redis/region/list");
 		return apiResult;
 	}
+	
+	@Override
+	public ApiResultObject getReidsRegionAz(Long regionId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+StringUtils.replace("/redis/region/{}/availableZone", "{}", String.valueOf(regionId)));
+		return apiResult;
+	}
 
 	@Override
 	public ApiResultObject getReidsConfig() {
@@ -120,10 +126,25 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ApiResultObject apiResult = RedisHttpClient.post(redisUrl+"/redis/service/checkNameExist", params);
 		return apiResult;
 	}
+	
+	@Override
+	public ApiResultObject checkCanCreate(Long clusterId, Integer memorySize) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("clusterId", String.valueOf(clusterId));
+		params.put("memorySize", String.valueOf(memorySize));
+		ApiResultObject apiResult = RedisHttpClient.post(redisUrl+"/redis/service/checkCanCreate", params);
+		return apiResult;
+	}
 
 	@Override
 	public ApiResultObject getStatusById(Long id) {
 		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/status", "{}", String.valueOf(id)));
+		return apiResult;
+	}
+	
+	@Override
+	public ApiResultObject getStatusWithAnalyse(Long id) {
+		ApiResultObject apiResult = getStatusById(id);
 		analyzeStatusResult(apiResult);
 		return apiResult;
 	}

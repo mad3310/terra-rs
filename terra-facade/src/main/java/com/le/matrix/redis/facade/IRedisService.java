@@ -30,6 +30,14 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject getReidsRegion();
 	
 	/**
+	 * 获取redis服务某个region下的可用区
+	 * @return
+	 */
+	@GET
+	@Path("/region/{regionId}/az")
+	ApiResultObject getReidsRegionAz(@PathParam("regionId") Long regionId);
+	
+	/**
 	 * 获取redis服务所有配置信息
 	 * @return
 	 */
@@ -54,12 +62,28 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject checkNameExist(@QueryParam("name") String name);
 	
 	/**
+	 * 检查可用区是否可以创建
+	 * @return
+	 */
+	@POST
+	@Path("/checkCanCreate")
+	ApiResultObject checkCanCreate(@QueryParam("clusterId") Long clusterId, @QueryParam("memorySize") Integer memorySize);
+	
+	/**
 	 * 根据redis id查询运行状态
 	 * @return
 	 */
 	@GET
 	@Path("/{id}/status")
 	ApiResultObject getStatusById(@PathParam("id") Long id);
+	
+	/**
+	 * 根据redis id查询运行状态并分析结果（工作流使用）
+	 * @return
+	 */
+	@GET
+	@Path("/{id}/status/analyse")
+	ApiResultObject getStatusWithAnalyse(@PathParam("id") Long id);
 	
 	/**
 	 * 根据redis id查询信息
