@@ -77,12 +77,24 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 			if(StringUtils.isNotEmpty(redis.getServiceId())) {
 				ApiResultObject apiResult = this.getInfoById(Long.parseLong(redis.getServiceId()));
 				List<Object> instances = JSONObject.parseArray(apiResult.getResult());
-				Map<String, Object> instance = (Map<String, Object>) instances.get(0);
+				Map<String, Object> info = (Map<String, Object>) instances.get(0);
+				Map<String, Object> instance = (Map<String, Object>) info.get("appDesc");
 				ret.put("name", instance.get("name"));
 				ret.put("status", instance.get("status"));
 				ret.put("type", redis.getType());
 				ret.put("memorySize", instance.get("memSize"));
 				ret.put("createTime", instance.get("createTime"));
+				
+				ret.put("domain", instance.get("domain"));
+				ret.put("clusterId", instance.get("clusterId"));
+				ret.put("clusterName", instance.get("clusterName"));
+				ret.put("clusterId", instance.get("clusterId"));
+				ret.put("configId", instance.get("configFile"));
+				ret.put("configName", instance.get("configFileName"));
+				ret.put("region", instance.get("region"));
+				ret.put("regionCNname", instance.get("regionCNname"));
+				ret.put("availableZoneId", instance.get("availableZoneId"));
+				ret.put("availableZoneName", instance.get("availableZoneName"));
 			} else {
 				ret.put("name", redis.getName());
 				ret.put("status", redis.getAuditStatus().getValue());
@@ -250,7 +262,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 				map.put("username", u.getUserName());
 				map.put("config", redis.getConfigId());
 				map.put("password", redis.getPassword());
-				map.put("clusterId", redis.getClusterId());
+				map.put("zoneId", redis.getAzId());
 				this.taskEngine.run("REDIS_CREATE", map);
 				
 				//更新配额使用量

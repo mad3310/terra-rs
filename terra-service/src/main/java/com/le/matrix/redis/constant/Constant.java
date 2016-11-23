@@ -21,5 +21,8 @@ public class Constant {
 	public static final String QUOTA_REDIS_NAME = "REDIS";
 	//配额redis 类型
 	public static final String QUOTA_REDIS_TYPE = "num";
+	
+	public static String REDIS_NAME="matrix";
+	public static String REDIS_TOKEN="21b72c0b7adc5c7b4a50ffcb90d92dd6";
 
 }

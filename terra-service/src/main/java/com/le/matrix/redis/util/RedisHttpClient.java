@@ -7,20 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 import com.alibaba.fastjson.JSONObject;
 import com.le.matrix.redis.constant.Constant;
 import com.le.matrix.redis.model.RESTfulResult;
 import com.letv.common.result.ApiResultObject;
 
+@Component
 public class RedisHttpClient {
 	
 	private final static Logger logger = LoggerFactory.getLogger(RedisHttpClient.class);
-	
-	@Value("${redis.name}")
-	private static String redisName;
-	@Value("${redis.token}")
-	private static String redisToken;
 	
 	public static ApiResultObject postObject(String url, Object obj) {
 		RESTfulResult restfulResult = StatusHttpClient.postObject(url, obj, Constant.CONNECTION_TIMEOUT, 
@@ -42,8 +39,8 @@ public class RedisHttpClient {
 	
 	private static Map<String, String> getHttpHeader() {
 		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("name", redisName);
-		headers.put("token", redisToken);
+		headers.put("name", Constant.REDIS_NAME);
+		headers.put("token", Constant.REDIS_TOKEN);
 		return headers;
 	}
 	
