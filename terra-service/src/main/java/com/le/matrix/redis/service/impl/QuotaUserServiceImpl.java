@@ -38,16 +38,16 @@ public class QuotaUserServiceImpl extends BaseServiceImpl<QuotaUser> implements 
 	}
 
 	@Override
-	public boolean checkQuota(String productName, String type, Long value) {
+	public boolean checkQuota(Long userId, String productName, String type, Long value) {
 		//根据产品名称和类型查询是否有用户配额信息
-		List<QuotaUser> quotaUsers = getUserQuotaByProductNameAndType(productName, type);
+		List<QuotaUser> quotaUsers = getUserQuotaByProductNameAndType(userId, productName, type);
 		
 		//待检查配额
 		QuotaUser checkQuota = null;
 		
 		//为空写入用户配额
 		if(CollectionUtils.isEmpty(quotaUsers)) {
-			checkQuota = insertUserQuota(productName, type);
+			checkQuota = insertUserQuota(userId, productName, type);
 		} else {
 			checkQuota = quotaUsers.get(0);
 		}
@@ -60,14 +60,15 @@ public class QuotaUserServiceImpl extends BaseServiceImpl<QuotaUser> implements 
 		}
 	}
 	
-	public List<QuotaUser> getUserQuotaByProductNameAndType(String productName, String type) {
+	public List<QuotaUser> getUserQuotaByProductNameAndType(Long userId, String productName, String type) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("name", productName);
 		params.put("type", type);
+		params.put("createUser", userId);
 		return quotaUserDao.selectByMap(params);
 	}
 	
-	private QuotaUser insertUserQuota(String productName, String type) {
+	private QuotaUser insertUserQuota(Long userId, String productName, String type) {
 		List<QuotaBase> quotaBases = quotaBaseService.getDefaultQuotaByProductNameAndType(productName, type);
 		QuotaUser qu = null;
 		for (QuotaBase quotaBase : quotaBases) {
@@ -76,6 +77,7 @@ public class QuotaUserServiceImpl extends BaseServiceImpl<QuotaUser> implements 
 			qu.setQuotaBaseId(quotaBase.getId());
 			qu.setQuotaBase(quotaBase);
 			qu.setCreateTime(new Timestamp(System.currentTimeMillis()));
+			qu.setCreateUser(userId);
 			quotaUserDao.insert(qu);
 		}
 		return qu;

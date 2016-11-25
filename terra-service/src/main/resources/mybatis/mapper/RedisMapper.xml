@@ -9,6 +9,7 @@
 	    <result column="NAME" property="name" />
 	    <result column="TYPE" property="type" jdbcType="TINYINT" typeHandler="com.le.matrix.redis.enumeration.IntValueEnumTypeHandler"/>
 	    <result column="MEMORY_SIZE" property="memorySize" />
+	    <result column="REGION_ID" property="regionId" />
 	    <result column="CONFIG_ID" property="configId" />
 	    <result column="AZ_ID" property="azId" />
 	    <result column="PASSWORD" property="password" />
@@ -26,21 +27,21 @@
 	</resultMap>
 	
 	<sql id="Base_Column_List">
-	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.AZ_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.CREATE_TIME,redis.CREATE_USER
+	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.REGION_ID,redis.CONFIG_ID,redis.AZ_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.CREATE_TIME,redis.CREATE_USER
 	    ,redis.AUDIT_STATUS,redis.AUDIT_INFO,redis.AUDIT_TIME,redis.AUDIT_USER
 	</sql>
 	<sql id="All_Column">
-	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.CONFIG_ID,redis.AZ_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.DELETED,redis.CREATE_TIME,redis.UPDATE_TIME,redis.CREATE_USER,redis.UPDATE_USER
+	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.REGION_ID,redis.CONFIG_ID,redis.AZ_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.DELETED,redis.CREATE_TIME,redis.UPDATE_TIME,redis.CREATE_USER,redis.UPDATE_USER
 		,redis.AUDIT_STATUS,redis.AUDIT_INFO,redis.AUDIT_TIME,redis.AUDIT_USER
 	</sql>
 	
 	<insert id="insert" parameterType="Redis" useGeneratedKeys="true" keyProperty="id" >
 	    insert into TERRA_REDIS 
-	        (NAME,TYPE,MEMORY_SIZE,CONFIG_ID,AZ_ID,PASSWORD,SERVICE_ID,DESCN,CREATE_TIME,UPDATE_TIME,CREATE_USER,UPDATE_USER,DELETED
+	        (NAME,TYPE,MEMORY_SIZE,REGION_ID,CONFIG_ID,AZ_ID,PASSWORD,SERVICE_ID,DESCN,CREATE_TIME,UPDATE_TIME,CREATE_USER,UPDATE_USER,DELETED
 	        ,AUDIT_STATUS,AUDIT_INFO,AUDIT_TIME,AUDIT_USER) 
 	    values
 	        (#{name},#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
-	         #{memorySize},#{configId},#{azId},#{password},#{serviceId},#{descn},#{createTime},#{updateTime},#{createUser},#{updateUser},#{deleted}
+	         #{memorySize},#{regionId},#{configId},#{azId},#{password},#{serviceId},#{descn},#{createTime},#{updateTime},#{createUser},#{updateUser},#{deleted}
 	         ,#{auditStatus,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
 	         ,#{auditInfo},#{auditTime},#{auditUser})
 	</insert>
@@ -59,6 +60,9 @@
 	        </if>
 	        <if test="memorySize != null ">
 	            and redis.MEMORY_SIZE=#{memorySize}
+	        </if>
+	        <if test="regionId != null ">
+	            and redis.REGION_ID=#{regionId}
 	        </if>
 	        <if test="configId != null ">
 	            and redis.CONFIG_ID=#{configId}
@@ -117,6 +121,9 @@
 	        <if test="memorySize != null ">
 	            MEMORY_SIZE=#{memorySize},
 	        </if>
+	        <if test="regionId != null ">
+	            REGION_ID=#{regionId},
+	        </if>
 	        <if test="configId != null ">
 	            CONFIG_ID=#{configId},
 	        </if>
@@ -167,6 +174,14 @@
 		delete from TERRA_REDIS where ID = #{id}
 	</delete>
 	
+	
+	<!-- 根据id查询-->
+	<select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select
+			<include refid="Base_Column_List" />
+		from TERRA_REDIS redis where redis.ID = #{id}
+	</select>
+	
 	<select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map">
 	    select
 	        <include refid="Base_Column_List" />
@@ -205,6 +220,12 @@
 			</if>
 			<if test="params != null and params.name != null and params.name != '' ">
 				and redis.NAME like CONCAT('%',#{params.name},'%') escape '^'
+			</if>
+			<if test="params != null and params.regionId != null  ">
+				and redis.REGION_ID=#{params.regionId}
+			</if>
+			<if test="params != null and params.configId != null  ">
+				and redis.CONFIG_ID=#{params.configId}
 			</if>
 			<if test="params != null and params.azId != null  ">
 				and redis.AZ_ID=#{params.azId}

@@ -16,6 +16,8 @@ public class Redis extends BaseModel {
 
 	private Integer memorySize;//缓存大小，单位G
 
+	private String regionId;//地域id
+	
 	private String configId;//配置文件id
 
 	private String azId;//可用区id
@@ -36,6 +38,17 @@ public class Redis extends BaseModel {
 
 	public Redis() {
 	}
+
+	
+	public String getRegionId() {
+		return regionId;
+	}
+
+
+	public void setRegionId(String regionId) {
+		this.regionId = regionId;
+	}
+
 
 	public AuditStatus getAuditStatus() {
 		return auditStatus;

@@ -74,42 +74,120 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		for (Redis redis : rediss) {
 			Map<String, Object> ret = new HashMap<String, Object>();
 			rets.add(ret);
-			if(StringUtils.isNotEmpty(redis.getServiceId())) {
-				ApiResultObject apiResult = this.getInfoById(Long.parseLong(redis.getServiceId()));
-				List<Object> instances = JSONObject.parseArray(apiResult.getResult());
-				Map<String, Object> info = (Map<String, Object>) instances.get(0);
-				Map<String, Object> instance = (Map<String, Object>) info.get("appDesc");
-				ret.put("name", instance.get("name"));
-				ret.put("status", instance.get("status"));
-				ret.put("type", redis.getType());
-				ret.put("memorySize", instance.get("memSize"));
-				ret.put("createTime", instance.get("createTime"));
-				
-				ret.put("domain", instance.get("domain"));
-				ret.put("clusterId", instance.get("clusterId"));
-				ret.put("clusterName", instance.get("clusterName"));
-				ret.put("clusterId", instance.get("clusterId"));
-				ret.put("configId", instance.get("configFile"));
-				ret.put("configName", instance.get("configFileName"));
-				ret.put("region", instance.get("region"));
-				ret.put("regionCNname", instance.get("regionCNname"));
-				ret.put("availableZoneId", instance.get("availableZoneId"));
-				ret.put("availableZoneName", instance.get("availableZoneName"));
-			} else {
-				ret.put("name", redis.getName());
-				ret.put("status", redis.getAuditStatus().getValue());
-				ret.put("type", redis.getType());
-				ret.put("memorySize", redis.getMemorySize());
-				ret.put("createTime", redis.getCreateTime());
+			if(StringUtils.isNotEmpty(redis.getServiceId())) {//redis服务已创建
+				useRemoteService(redis, ret);
+			} else {//redis服务未创建
+				useDbInfo(redis, ret);
 			}
 		}
 		p.setData(rets);
 		return p;
 	}
 	
+	/**
+	 * 使用调用远程redis服务获取redis信息
+	 * @param redis
+	 * @param ret
+	 */
+	@SuppressWarnings("unchecked")
+	private void useRemoteService(Redis redis, Map<String, Object> ret) {
+		ApiResultObject apiResult = this.getInstanceByServiceId(Long.parseLong(redis.getServiceId()));
+		Map<String, Object> instance = null;
+		if(apiResult.getAnalyzeResult()) {
+			List<Object> instances = JSONObject.parseArray(apiResult.getResult());
+			Map<String, Object> info = (Map<String, Object>) instances.get(0);
+			instance = (Map<String, Object>) info.get("appDesc");
+		} else {
+			instance = new HashMap<String, Object>();
+		}
+		
+		ret.put("name", instance.get("name"));
+		ret.put("status", instance.get("status"));
+		ret.put("type", redis.getType());
+		ret.put("memorySize", instance.get("memSize"));
+		ret.put("createTime", instance.get("createTime"));
+		
+		ret.put("domain", instance.get("domain"));
+		ret.put("clusterId", instance.get("clusterId"));
+		ret.put("clusterName", instance.get("clusterName"));
+		ret.put("configId", instance.get("configFile"));
+		ret.put("configName", instance.get("configFileName"));
+		ret.put("region", instance.get("region"));
+		ret.put("regionCNname", instance.get("regionCNname"));
+		ret.put("azId", instance.get("availableZoneId"));
+		ret.put("azName", instance.get("availableZoneName"));
+	}
+	
+	/**
+	 * 使用数据库信息获取redis信息
+	 * @param redis
+	 * @param ret
+	 */
+	private void useDbInfo(Redis redis, Map<String, Object> ret) {
+		ret.put("name", redis.getName());
+		ret.put("status", redis.getAuditStatus().getValue());
+		ret.put("type", redis.getType());
+		ret.put("memorySize", redis.getMemorySize());
+		ret.put("createTime", redis.getCreateTime());
+		
+		ret.put("domain", null);
+		ret.put("configId", redis.getConfigId());
+		ret.put("configName", getConfigName(Long.parseLong(redis.getConfigId())));
+		
+		Map<String, String> regionInfo = getRegionInfo(Long.parseLong(redis.getRegionId()));
+		ret.put("region", regionInfo.get("regionName"));
+		ret.put("regionCNname", regionInfo.get("regionCNname"));
+		ret.put("azId", redis.getAzId());
+		ret.put("azName", getAzName(Long.parseLong(redis.getAzId())));
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private String getConfigName(Long id) {
+		ApiResultObject apiResult = getReidsConfigById(id);
+		if(apiResult.getAnalyzeResult()) {
+			Map ret = JSONObject.parseObject(apiResult.getResult(), Map.class);
+			return ret==null ? null : (String) ret.get("name");
+		}
+		return null;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private Map<String, String> getRegionInfo(Long id) {
+		ApiResultObject apiResult = this.getRegionByRegionId(id);
+		Map<String, String> ret = new HashMap<String, String>();
+		if(apiResult.getAnalyzeResult()) {
+			Map map = JSONObject.parseObject(apiResult.getResult(), Map.class);
+			ret.put("regionName", map==null ? null : String.valueOf(map.get("regionName")));
+			ret.put("regionCNname", map==null ? null : String.valueOf(map.get("regionCNname")));
+		}
+		return ret;
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private String getAzName(Long id) {
+		ApiResultObject apiResult = this.getAzByAzId(id);
+		if(apiResult.getAnalyzeResult()) {
+			Map ret = JSONObject.parseObject(apiResult.getResult(), Map.class);
+			return ret==null ? null : (String) ret.get("name");
+		}
+		return null;
+	}
+	
 	@Override
 	public ApiResultObject getReidsRegion() {
 		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+"/redis/region/list");
+		return apiResult;
+	}
+	
+	@Override
+	public ApiResultObject getRegionByRegionId(Long regionId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+StringUtils.replace("/redis/region/{}", "{}", String.valueOf(regionId)));
+		return apiResult;
+	}
+	
+	@Override
+	public ApiResultObject getAzByAzId(Long azId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+StringUtils.replace("/redis/availableZone/{}", "{}", String.valueOf(azId)));
 		return apiResult;
 	}
 	
@@ -140,12 +218,22 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@Override
-	public ApiResultObject checkCanCreate(Long clusterId, Integer memorySize) {
+	public ApiResultObject checkCanCreate(Long azId, Integer memorySize) {
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("clusterId", String.valueOf(clusterId));
-		params.put("memorySize", String.valueOf(memorySize));
+		params.put("zoneId", String.valueOf(azId));
+		params.put("memSize", String.valueOf(memorySize));
 		ApiResultObject apiResult = RedisHttpClient.post(redisUrl+"/redis/service/checkCanCreate", params);
+		analyzeCanCreateResult(apiResult);
 		return apiResult;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void analyzeCanCreateResult(ApiResultObject apiResult) {
+		if(apiResult.getAnalyzeResult()) {
+			Map<String, Object> resultMap = JSONObject.parseObject(apiResult.getResult(), Map.class);
+			Boolean canCreate = (Boolean) resultMap.get("canCreate");
+			apiResult.setAnalyzeResult(canCreate);
+		}
 	}
 
 	@Override
@@ -173,7 +261,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 
 	@Override
-	public ApiResultObject getInfoById(Long id) {
+	public ApiResultObject getInstanceByServiceId(Long id) {
 		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}", "{}", String.valueOf(id)));
 		return apiResult;
 	}
@@ -198,10 +286,40 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 
 	@Override
 	public ApiResultObject createInstance(Map<String, String> params) {
-		ApiResultObject apiResult = RedisHttpClient.post(redisUrl+"/redis/service/save", params);
-		//变更为符合工作流模板方式
-		analyzeCreateResult(apiResult);
+		Long redisId = Long.parseLong(params.get("id"));
+		Redis redis = this.selectById(redisId);
+		ApiResultObject apiResult = null;
+		//如果redis服务端创建失败后，重试时需要调用“reCreate”接口
+		if(StringUtils.isNotEmpty(redis.getServiceId())) {
+			apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/reCreate", "{}", redis.getServiceId()));
+			analyzeReCreateResult(apiResult);
+		} else {
+			apiResult = RedisHttpClient.post(redisUrl+"/redis/service/save", params);
+			//变更为符合工作流模板方式
+			analyzeCreateResult(apiResult);
+		}
 		return apiResult;
+	}
+	
+	@Override
+	public ApiResultObject createDomain(String serviceId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/createDomain", "{}", String.valueOf(serviceId)));
+		return apiResult;
+	}
+	
+	@Override
+	public ApiResultObject publishDomain(String serviceId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/publishDomain", "{}", String.valueOf(serviceId)));
+		return apiResult;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void analyzeReCreateResult(ApiResultObject apiResult) {
+		if(apiResult.getAnalyzeResult()) {
+			Map<String, Object> resultMap = JSONObject.parseObject(apiResult.getResult(), Map.class);
+			String serviceId = String.valueOf(resultMap.get("appId"));
+			apiResult.setResult(serviceId);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -219,7 +337,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		User u = userService.getUserById(redis.getCreateUser());
 		
 		if(LockUtil.getDistributedLock(String.valueOf(u.getId()))) {//获取到分布式锁
-			boolean checkResult = quotaUserService.checkQuota(Constant.QUOTA_REDIS_NAME, Constant.QUOTA_REDIS_TYPE, 1l);
+			boolean checkResult = quotaUserService.checkQuota(redis.getCreateUser(), Constant.QUOTA_REDIS_NAME, Constant.QUOTA_REDIS_TYPE, 1l);
 			if(checkResult) {
 				auditAndBuild(redis, null, null);
 			} else {
@@ -244,15 +362,24 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		defaultEmailSender.sendMessage(mailMessage);
 	}
 	
-	
 	@Override
+	public void auditAndBuild(Long redisId, String auditInfo, Long auditUser) {
+		Redis redis = this.selectById(redisId);
+		if(redis.getAuditStatus()==AuditStatus.WAIT) {//待审核状态才进行创建
+			auditAndBuild(redis, auditInfo, auditUser);
+		} else {
+			throw new ValidateException("状态无法审核");
+		}
+	}
+	
 	public void auditAndBuild(Redis redis, String auditInfo, Long auditUser) {
 		if(LockUtil.getDistributedLock("createRedis")) {
 			User u = userService.getUserById(redis.getCreateUser());
 			//校验redis服务是否合法
-			ApiResultObject apiResultObject = this.checkNameExist(redis.getName());
+			ApiResultObject nameCheckResult = this.checkNameExist(redis.getName());
+			ApiResultObject canCreateCheckResult = this.checkCanCreate(Long.parseLong(redis.getAzId()), redis.getMemorySize());
 			
-			if(apiResultObject.getAnalyzeResult()) {//合法
+			if(nameCheckResult.getAnalyzeResult() && canCreateCheckResult.getAnalyzeResult()) {//合法
 				//进行审核
 				Map<String,Object> map = new HashMap<String,Object>();
 				map.put("id", redis.getId());
@@ -266,7 +393,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 				this.taskEngine.run("REDIS_CREATE", map);
 				
 				//更新配额使用量
-				updateQuotaUser();
+				updateQuotaUser(redis.getCreateUser());
 				
 				//更新redis信息
 				updateRedisAudit(redis, auditInfo, auditUser, AuditStatus.APPROVE);
@@ -279,21 +406,27 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		
 	}
 	
-	private void updateQuotaUser() {
-		List<QuotaUser> quotaUsers = quotaUserService.getUserQuotaByProductNameAndType(Constant.QUOTA_REDIS_NAME, Constant.QUOTA_REDIS_TYPE);
+	private void updateQuotaUser(Long userId) {
+		List<QuotaUser> quotaUsers = quotaUserService.getUserQuotaByProductNameAndType(userId, Constant.QUOTA_REDIS_NAME, Constant.QUOTA_REDIS_TYPE);
 		QuotaUser quotaUser = quotaUsers.get(0);
 		quotaUser.setUsed(quotaUser.getUsed()+1);
 		quotaUserService.updateBySelective(quotaUser);
 	}
 	
 	@Override
-	public void reject(Redis redis, String auditInfo, Long auditUser) {
-		updateRedisAudit(redis, auditInfo, auditUser, AuditStatus.REJECT);
+	public void reject(Long redisId, String auditInfo, Long auditUser) {
+		Redis redis = this.selectById(redisId);
+		if(redis.getAuditStatus()==AuditStatus.WAIT) {//待审核状态才进行驳回
+			updateRedisAudit(redis, auditInfo, auditUser, AuditStatus.REJECT);
+		} else {
+			throw new ValidateException("状态无法驳回");
+		}
 	}
 	
 	private void updateRedisAudit(Redis redis, String auditInfo, Long auditUser, AuditStatus auditStatus) {
 		redis.setAuditInfo(auditInfo);
 		redis.setAuditStatus(auditStatus);
+		redis.setAuditUser(auditUser);
 		redis.setAuditTime(new Date());
 		this.redisDao.updateBySelective(redis);
 	}
@@ -316,4 +449,34 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		logger.info("检测该用户redis配额并执行");
     	this.build(redis);
 	}
+
+	@Override
+	public ApiResultObject sendUserEmail(Long id) {
+		ApiResultObject ret = new ApiResultObject();
+		try {
+			Redis redis = this.selectById(id);
+			User u = this.userService.getUserById(redis.getCreateUser());
+			
+			Map<String, Object> info = new HashMap<String, Object>();
+			useRemoteService(redis, info);
+			
+			Map<String, Object> emailParams = new HashMap<String,Object>();
+			emailParams.put("name", info.get("name"));
+			emailParams.put("url", info.get("domain"));
+			email4User(emailParams, u.getEmail(), "createRedis.ftl");
+			ret.setAnalyzeResult(true);
+		} catch (Exception e) {
+			ret.setAnalyzeResult(false);
+			logger.error(e.getMessage(), e);
+		}
+		return ret;
+	}
+	
+	private void email4User(Map<String,Object> params, String email, String ftlName){
+		MailMessage mailMessage = new MailMessage("乐视云平台Matrix系统", email, "乐视云平台Matrix系统通知", ftlName, params);
+		mailMessage.setHtml(true);
+		defaultEmailSender.sendMessage(mailMessage);
+	}
+	
+	
 }

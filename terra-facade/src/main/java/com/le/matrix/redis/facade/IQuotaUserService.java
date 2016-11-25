@@ -31,11 +31,11 @@ public interface IQuotaUserService extends IBaseService<QuotaUser> {
 	 */
 	@GET
 	@Path("check")
-	boolean checkQuota(@QueryParam("productName") String productName, 
+	boolean checkQuota(@QueryParam("userId") Long userId, @QueryParam("productName") String productName, 
 					   @QueryParam("type") String type, @QueryParam("value") Long value);
 	
 	@GET
 	@Path("selective")
-	List<QuotaUser> getUserQuotaByProductNameAndType(@QueryParam("productName") String productName, 
+	List<QuotaUser> getUserQuotaByProductNameAndType(@QueryParam("userId") Long userId, @QueryParam("productName") String productName, 
 			   @QueryParam("type") String type);
 }

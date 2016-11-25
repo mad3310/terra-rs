@@ -30,6 +30,22 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject getReidsRegion();
 	
 	/**
+	 * 根据id获取region
+	 * @return
+	 */
+	@GET
+	@Path("/region/{regionId}")
+	ApiResultObject getRegionByRegionId(@PathParam("regionId") Long regionId);
+	
+	/**
+	 * 根据id获取可用区
+	 * @return
+	 */
+	@GET
+	@Path("/az/{azId}")
+	ApiResultObject getAzByAzId(@PathParam("azId") Long azId);
+	
+	/**
 	 * 获取redis服务某个region下的可用区
 	 * @return
 	 */
@@ -67,7 +83,7 @@ public interface IRedisService extends IBaseService<Redis> {
 	 */
 	@POST
 	@Path("/checkCanCreate")
-	ApiResultObject checkCanCreate(@QueryParam("clusterId") Long clusterId, @QueryParam("memorySize") Integer memorySize);
+	ApiResultObject checkCanCreate(@QueryParam("azId") Long azId, @QueryParam("memorySize") Integer memorySize);
 	
 	/**
 	 * 根据redis id查询运行状态
@@ -91,7 +107,7 @@ public interface IRedisService extends IBaseService<Redis> {
 	 */
 	@GET
 	@Path("/instance/{id}")
-	ApiResultObject getInfoById(@PathParam("id") Long id);
+	ApiResultObject getInstanceByServiceId(@PathParam("id") Long id);
 	
 	/**
 	 * 根据redis id下线实例
@@ -126,6 +142,22 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject createInstance(Map<String, String> params);
 	
 	/**
+	 * 根据serviceId创建域名
+	 * @return
+	 */
+	@POST
+	@Path("/createDomain")
+	ApiResultObject createDomain(@QueryParam("serviceId") String serviceId);
+	
+	/**
+	 * 根据serviceId发布域名
+	 * @return
+	 */
+	@POST
+	@Path("/publishDomain")
+	ApiResultObject publishDomain(@QueryParam("serviceId") String serviceId);
+	
+	/**
 	 * 检查并调用工作流
 	 * @param redis
 	 * @return
@@ -136,13 +168,13 @@ public interface IRedisService extends IBaseService<Redis> {
 	
 	/**
 	 * 审核并调用工作流
-	 * @param redis
+	 * @param redisId
 	 * @param auditInfo
 	 * @param auditUser
 	 */
-	@GET
+	@POST
 	@Path("/audit")
-	void auditAndBuild(Redis redis, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
+	void auditAndBuild(@QueryParam("redisId") Long redisId, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
 	
 	/**
 	 * 驳回
@@ -150,11 +182,15 @@ public interface IRedisService extends IBaseService<Redis> {
 	 * @param auditInfo
 	 * @param auditUser
 	 */
-	@GET
+	@POST
 	@Path("/reject")
-	void reject(Redis redis, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
+	void reject(@QueryParam("redisId") Long redisId, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
 	
 	@GET
 	@Path("/instance")
 	ApiResultObject updateServiceIdById(@QueryParam("serviceId") String serviceId, @QueryParam("id") Long id);
+	
+	@GET
+	@Path("/email")
+	ApiResultObject sendUserEmail(@QueryParam("id") Long id);
 }
