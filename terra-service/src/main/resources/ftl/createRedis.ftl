@@ -42,8 +42,8 @@ p {
 		<th width="100px">服务地址</th>
 	</tr>
 	<tr>
-		<td>${name}</td>
-		<td>${url}</td>
+		<td>${redisName}</td>
+		<td>${redisUrl}</td>
 	</tr>
 </table>
 <br/>

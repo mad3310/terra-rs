@@ -107,7 +107,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ret.put("memorySize", instance.get("memSize"));
 		ret.put("createTime", instance.get("createTime"));
 		
-		ret.put("domain", instance.get("domain"));
+		ret.put("domain", instance.get("domain")==null ? null : JSONObject.parseArray((String) instance.get("domain")));
 		ret.put("clusterId", instance.get("clusterId"));
 		ret.put("clusterName", instance.get("clusterName"));
 		ret.put("configId", instance.get("configFile"));
@@ -142,8 +142,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private String getConfigName(Long id) {
-		ApiResultObject apiResult = getReidsConfigById(id);
+	private String getConfigName(Long configId) {
+		ApiResultObject apiResult = getReidsConfigByConfigId(configId);
 		if(apiResult.getAnalyzeResult()) {
 			Map ret = JSONObject.parseObject(apiResult.getResult(), Map.class);
 			return ret==null ? null : (String) ret.get("name");
@@ -152,8 +152,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private Map<String, String> getRegionInfo(Long id) {
-		ApiResultObject apiResult = this.getRegionByRegionId(id);
+	private Map<String, String> getRegionInfo(Long regionId) {
+		ApiResultObject apiResult = this.getRegionByRegionId(regionId);
 		Map<String, String> ret = new HashMap<String, String>();
 		if(apiResult.getAnalyzeResult()) {
 			Map map = JSONObject.parseObject(apiResult.getResult(), Map.class);
@@ -164,8 +164,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private String getAzName(Long id) {
-		ApiResultObject apiResult = this.getAzByAzId(id);
+	private String getAzName(Long azId) {
+		ApiResultObject apiResult = this.getAzByAzId(azId);
 		if(apiResult.getAnalyzeResult()) {
 			Map ret = JSONObject.parseObject(apiResult.getResult(), Map.class);
 			return ret==null ? null : (String) ret.get("name");
@@ -204,8 +204,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@Override
-	public ApiResultObject getReidsConfigById(Long id) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/config/{}", "{}", String.valueOf(id)));
+	public ApiResultObject getReidsConfigByConfigId(Long configId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/config/{}", "{}", String.valueOf(configId)));
 		return apiResult;
 	}
 
@@ -237,14 +237,14 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 
 	@Override
-	public ApiResultObject getStatusById(Long id) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/status", "{}", String.valueOf(id)));
+	public ApiResultObject getStatusByServiceId(Long serviceId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/status", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 	
 	@Override
-	public ApiResultObject getStatusWithAnalyse(Long id) {
-		ApiResultObject apiResult = getStatusById(id);
+	public ApiResultObject getStatusWithAnalyse(Long serviceId) {
+		ApiResultObject apiResult = getStatusByServiceId(serviceId);
 		analyzeStatusResult(apiResult);
 		return apiResult;
 	}
@@ -261,26 +261,26 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 
 	@Override
-	public ApiResultObject getInstanceByServiceId(Long id) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}", "{}", String.valueOf(id)));
+	public ApiResultObject getInstanceByServiceId(Long serviceId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 
 	@Override
-	public ApiResultObject offline(Long id) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/offline", "{}", String.valueOf(id)));
+	public ApiResultObject offline(Long serviceId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/offline", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 
 	@Override
-	public ApiResultObject start(Long id) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/start", "{}", String.valueOf(id)));
+	public ApiResultObject start(Long serviceId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/start", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 	
 	@Override
-	public ApiResultObject deleteInstance(Long id) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/delete", "{}", String.valueOf(id)));
+	public ApiResultObject deleteInstance(Long serviceId) {
+		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/delete", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 
@@ -363,8 +363,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@Override
-	public void auditAndBuild(Long redisId, String auditInfo, Long auditUser) {
-		Redis redis = this.selectById(redisId);
+	public void auditAndBuild(Long id, String auditInfo, Long auditUser) {
+		Redis redis = this.selectById(id);
 		if(redis.getAuditStatus()==AuditStatus.WAIT) {//待审核状态才进行创建
 			auditAndBuild(redis, auditInfo, auditUser);
 		} else {
@@ -373,7 +373,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	public void auditAndBuild(Redis redis, String auditInfo, Long auditUser) {
-		if(LockUtil.getDistributedLock("createRedis")) {
+		if(LockUtil.getDistributedLock("createOrDeleteRedis")) {
 			User u = userService.getUserById(redis.getCreateUser());
 			//校验redis服务是否合法
 			ApiResultObject nameCheckResult = this.checkNameExist(redis.getName());
@@ -393,29 +393,29 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 				this.taskEngine.run("REDIS_CREATE", map);
 				
 				//更新配额使用量
-				updateQuotaUser(redis.getCreateUser());
+				updateQuotaUser(redis.getCreateUser(), 1);
 				
 				//更新redis信息
 				updateRedisAudit(redis, auditInfo, auditUser, AuditStatus.APPROVE);
 			}
 			
-			LockUtil.releaseDistributedLock("createRedis");
+			LockUtil.releaseDistributedLock("createOrDeleteRedis");
 		} else {
 			throw new ValidateException("服务器正忙,请稍后重试!");
 		}
 		
 	}
 	
-	private void updateQuotaUser(Long userId) {
+	private void updateQuotaUser(Long userId, Integer size) {
 		List<QuotaUser> quotaUsers = quotaUserService.getUserQuotaByProductNameAndType(userId, Constant.QUOTA_REDIS_NAME, Constant.QUOTA_REDIS_TYPE);
 		QuotaUser quotaUser = quotaUsers.get(0);
-		quotaUser.setUsed(quotaUser.getUsed()+1);
+		quotaUser.setUsed(quotaUser.getUsed()+size);
 		quotaUserService.updateBySelective(quotaUser);
 	}
 	
 	@Override
-	public void reject(Long redisId, String auditInfo, Long auditUser) {
-		Redis redis = this.selectById(redisId);
+	public void reject(Long id, String auditInfo, Long auditUser) {
+		Redis redis = this.selectById(id);
 		if(redis.getAuditStatus()==AuditStatus.WAIT) {//待审核状态才进行驳回
 			updateRedisAudit(redis, auditInfo, auditUser, AuditStatus.REJECT);
 		} else {
@@ -450,6 +450,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
     	this.build(redis);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ApiResultObject sendUserEmail(Long id) {
 		ApiResultObject ret = new ApiResultObject();
@@ -461,8 +462,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 			useRemoteService(redis, info);
 			
 			Map<String, Object> emailParams = new HashMap<String,Object>();
-			emailParams.put("name", info.get("name"));
-			emailParams.put("url", info.get("domain"));
+			emailParams.put("redisName", info.get("name"));
+			emailParams.put("redisUrl", info.get("domain")==null ? "" : getRedisDomains((List<Map>)info.get("domain")));
 			email4User(emailParams, u.getEmail(), "createRedis.ftl");
 			ret.setAnalyzeResult(true);
 		} catch (Exception e) {
@@ -472,10 +473,36 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		return ret;
 	}
 	
+	private String getRedisDomains(List<Map> list) {
+		StringBuilder domains = new StringBuilder();
+		for (Map map : list) {
+			domains.append(map.get("domain")).append("<br>");
+		}
+		return domains.toString();
+	}
+	
 	private void email4User(Map<String,Object> params, String email, String ftlName){
 		MailMessage mailMessage = new MailMessage("乐视云平台Matrix系统", email, "乐视云平台Matrix系统通知", ftlName, params);
 		mailMessage.setHtml(true);
 		defaultEmailSender.sendMessage(mailMessage);
+	}
+
+	@Override
+	public ApiResultObject deleteDbAndInstance(Long id) {
+		ApiResultObject apiResult = new ApiResultObject();
+		Redis r = this.selectById(id);
+		if(LockUtil.getDistributedLock("createOrDeleteRedis")) {//获取到分布式锁
+			deleteInstance(Long.parseLong(r.getServiceId()));
+			delete(r);
+			updateQuotaUser(r.getCreateUser(), -1);
+			//释放锁
+			LockUtil.releaseDistributedLock("createOrDeleteRedis");
+			apiResult.setAnalyzeResult(true);
+		} else {
+			apiResult.setAnalyzeResult(false);
+			apiResult.setResult("获取分布式锁失败");
+		}
+		return apiResult;
 	}
 	
 	

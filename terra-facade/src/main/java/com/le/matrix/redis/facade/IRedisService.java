@@ -62,12 +62,12 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject getReidsConfig();
 	
 	/**
-	 * 获取redis服务所有配置信息
+	 * 根据configId获取配置信息
 	 * @return
 	 */
 	@GET
-	@Path("/region/config/{id}")
-	ApiResultObject getReidsConfigById(@PathParam("id") Long id);
+	@Path("/region/config/{configId}")
+	ApiResultObject getReidsConfigByConfigId(@PathParam("configId") Long configId);
 	
 	/**
 	 * 根据redis名称查询是否存在
@@ -86,52 +86,60 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject checkCanCreate(@QueryParam("azId") Long azId, @QueryParam("memorySize") Integer memorySize);
 	
 	/**
-	 * 根据redis id查询运行状态
+	 * 根据redis serviceId查询运行状态
 	 * @return
 	 */
 	@GET
-	@Path("/{id}/status")
-	ApiResultObject getStatusById(@PathParam("id") Long id);
+	@Path("/{serviceId}/status")
+	ApiResultObject getStatusByServiceId(@PathParam("serviceId") Long serviceId);
 	
 	/**
-	 * 根据redis id查询运行状态并分析结果（工作流使用）
+	 * 根据redis serviceId查询运行状态并分析结果（工作流使用）
 	 * @return
 	 */
 	@GET
-	@Path("/{id}/status/analyse")
-	ApiResultObject getStatusWithAnalyse(@PathParam("id") Long id);
+	@Path("/{serviceId}/status/analyse")
+	ApiResultObject getStatusWithAnalyse(@PathParam("serviceId") Long serviceId);
 	
 	/**
-	 * 根据redis id查询信息
+	 * 根据redis serviceId查询信息
 	 * @return
 	 */
 	@GET
-	@Path("/instance/{id}")
-	ApiResultObject getInstanceByServiceId(@PathParam("id") Long id);
+	@Path("/instance/{serviceId}")
+	ApiResultObject getInstanceByServiceId(@PathParam("serviceId") Long serviceId);
 	
 	/**
 	 * 根据redis id下线实例
 	 * @return
 	 */
 	@GET
-	@Path("/{id}/offline")
-	ApiResultObject offline(@PathParam("id") Long id);
+	@Path("/{serviceId}/offline")
+	ApiResultObject offline(@PathParam("serviceId") Long serviceId);
 	
 	/**
-	 * 根据redis id启动实例
+	 * 根据redis serviceId启动实例
 	 * @return
 	 */
 	@GET
-	@Path("/{id}/start")
-	ApiResultObject start(@PathParam("id") Long id);
+	@Path("/{serviceId}/start")
+	ApiResultObject start(@PathParam("serviceId") Long serviceId);
 	
 	/**
-	 * 根据redis id启动实例
+	 * 根据redis serviceId启动实例
 	 * @return
 	 */
 	@DELETE
-	@Path("/{id}/delete")
-	ApiResultObject deleteInstance(@PathParam("id") Long id);
+	@Path("/{id}/deleteDbAndInstance")
+	ApiResultObject deleteDbAndInstance(@PathParam("id") Long id);
+	
+	/**
+	 * 根据redis serviceId删除实例
+	 * @return
+	 */
+	@DELETE
+	@Path("/{serviceId}/delete")
+	ApiResultObject deleteInstance(@PathParam("serviceId") Long serviceId);
 	
 	/**
 	 * 根据redis信息创建实例
@@ -145,7 +153,7 @@ public interface IRedisService extends IBaseService<Redis> {
 	 * 根据serviceId创建域名
 	 * @return
 	 */
-	@POST
+	@GET
 	@Path("/createDomain")
 	ApiResultObject createDomain(@QueryParam("serviceId") String serviceId);
 	
@@ -153,7 +161,7 @@ public interface IRedisService extends IBaseService<Redis> {
 	 * 根据serviceId发布域名
 	 * @return
 	 */
-	@POST
+	@GET
 	@Path("/publishDomain")
 	ApiResultObject publishDomain(@QueryParam("serviceId") String serviceId);
 	
@@ -174,7 +182,7 @@ public interface IRedisService extends IBaseService<Redis> {
 	 */
 	@POST
 	@Path("/audit")
-	void auditAndBuild(@QueryParam("redisId") Long redisId, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
+	void auditAndBuild(@QueryParam("id") Long id, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
 	
 	/**
 	 * 驳回
@@ -184,12 +192,23 @@ public interface IRedisService extends IBaseService<Redis> {
 	 */
 	@POST
 	@Path("/reject")
-	void reject(@QueryParam("redisId") Long redisId, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
+	void reject(@QueryParam("id") Long id, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
 	
+	/**
+	 * 更新redis信息（serviceId）
+	 * @param serviceId
+	 * @param id
+	 * @return
+	 */
 	@GET
 	@Path("/instance")
 	ApiResultObject updateServiceIdById(@QueryParam("serviceId") String serviceId, @QueryParam("id") Long id);
 	
+	/**
+	 * 给用户发送成功邮件（工作流调用）
+	 * @param id
+	 * @return
+	 */
 	@GET
 	@Path("/email")
 	ApiResultObject sendUserEmail(@QueryParam("id") Long id);
