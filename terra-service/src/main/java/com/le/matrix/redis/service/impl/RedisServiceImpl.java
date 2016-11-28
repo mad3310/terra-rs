@@ -72,16 +72,24 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		List<Redis> rediss = (List<Redis>) p.getData();
 		List<Map<String, Object>> rets = new ArrayList<Map<String, Object>>();
 		for (Redis redis : rediss) {
-			Map<String, Object> ret = new HashMap<String, Object>();
+			Map<String, Object> ret = getGroupInfo(redis);
 			rets.add(ret);
-			if(StringUtils.isNotEmpty(redis.getServiceId())) {//redis服务已创建
-				useRemoteService(redis, ret);
-			} else {//redis服务未创建
-				useDbInfo(redis, ret);
-			}
 		}
 		p.setData(rets);
 		return p;
+	}
+	
+	private Map<String, Object> getGroupInfo(Redis redis) {
+		Map<String, Object> ret = new HashMap<String, Object>();
+		if(null == redis) {
+			return ret;
+		}
+		if(StringUtils.isNotEmpty(redis.getServiceId())) {//redis服务已创建
+			useRemoteService(redis, ret);
+		} else {//redis服务未创建
+			useDbInfo(redis, ret);
+		}
+		return ret;
 	}
 	
 	/**
@@ -101,6 +109,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 			instance = new HashMap<String, Object>();
 		}
 		
+		ret.put("id", redis.getId());
+		ret.put("serviceId", redis.getServiceId());
 		ret.put("name", instance.get("name"));
 		ret.put("status", instance.get("status"));
 		ret.put("type", redis.getType());
@@ -124,6 +134,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	 * @param ret
 	 */
 	private void useDbInfo(Redis redis, Map<String, Object> ret) {
+		ret.put("id", redis.getId());
+		ret.put("serviceId", redis.getServiceId());
 		ret.put("name", redis.getName());
 		ret.put("status", redis.getAuditStatus().getValue());
 		ret.put("type", redis.getType());
@@ -139,6 +151,16 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ret.put("regionCNname", regionInfo.get("regionCNname"));
 		ret.put("azId", redis.getAzId());
 		ret.put("azName", getAzName(Long.parseLong(redis.getAzId())));
+	}
+	
+	@Override
+	public ApiResultObject getRedisById(Long id) {
+		Redis redis = super.selectById(id);
+		Map<String, Object> ret = getGroupInfo(redis);
+		ApiResultObject apiResult = new ApiResultObject();
+		apiResult.setAnalyzeResult(true);
+		apiResult.setResult(JSONObject.toJSONString(ret));
+		return apiResult;
 	}
 	
 	@SuppressWarnings("rawtypes")

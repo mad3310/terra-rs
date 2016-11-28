@@ -49,7 +49,7 @@ public class LockUtil {
 			public Object analyzeResult(Object r) {
 				return r;
 			}
-		}, 60*1000, 5*000);
+		}, 60*1000, 5*1000);
         
         return (boolean) ret.get("judgeAnalyzeResult");
     }

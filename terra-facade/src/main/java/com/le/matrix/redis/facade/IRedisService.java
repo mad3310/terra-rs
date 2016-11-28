@@ -110,6 +110,14 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject getInstanceByServiceId(@PathParam("serviceId") Long serviceId);
 	
 	/**
+	 * 根据redis id查询信息(信息组合)
+	 * @return
+	 */
+	@GET
+	@Path("/group/{id}")
+	ApiResultObject getRedisById(@PathParam("id") Long id);
+	
+	/**
 	 * 根据redis id下线实例
 	 * @return
 	 */
