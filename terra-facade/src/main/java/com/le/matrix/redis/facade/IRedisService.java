@@ -4,6 +4,7 @@ import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -14,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.alibaba.dubbo.rpc.protocol.rest.support.ContentType;
 import com.le.matrix.redis.model.Redis;
+import com.letv.common.paging.impl.Page;
 import com.letv.common.result.ApiResultObject;
 
 @Path("redis")
@@ -180,7 +182,7 @@ public interface IRedisService extends IBaseService<Redis> {
 	 */
 	@POST
 	@Path("/build")
-	void build(Redis redis);
+	ApiResultObject build(Redis redis);
 	
 	/**
 	 * 审核并调用工作流
@@ -190,7 +192,8 @@ public interface IRedisService extends IBaseService<Redis> {
 	 */
 	@POST
 	@Path("/audit")
-	void auditAndBuild(@QueryParam("id") Long id, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	ApiResultObject auditAndBuild(@FormParam("id") Long id, @FormParam("auditInfo") String auditInfo, @FormParam("auditUser") Long auditUser);
 	
 	/**
 	 * 驳回
@@ -200,7 +203,8 @@ public interface IRedisService extends IBaseService<Redis> {
 	 */
 	@POST
 	@Path("/reject")
-	void reject(@QueryParam("id") Long id, @QueryParam("auditInfo") String auditInfo, @QueryParam("auditUser") Long auditUser);
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	ApiResultObject reject(@FormParam("id") Long id, @FormParam("auditInfo") String auditInfo, @FormParam("auditUser") Long auditUser);
 	
 	/**
 	 * 更新redis信息（serviceId）
@@ -220,4 +224,10 @@ public interface IRedisService extends IBaseService<Redis> {
 	@GET
 	@Path("/email")
 	ApiResultObject sendUserEmail(@QueryParam("id") Long id);
+	
+	@POST
+	@Path("/pending")
+	ApiResultObject queryPendingRedis(Page p);
+	
+	
 }

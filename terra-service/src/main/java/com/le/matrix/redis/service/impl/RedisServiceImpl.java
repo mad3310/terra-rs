@@ -18,7 +18,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.le.matrix.hemera.facade.ITaskEngine;
 import com.le.matrix.redis.constant.Constant;
 import com.le.matrix.redis.dao.IRedisDao;
-import com.le.matrix.redis.enumeration.AuditStatus;
+import com.le.matrix.redis.enumeration.Status;
 import com.le.matrix.redis.facade.IQuotaUserService;
 import com.le.matrix.redis.facade.IRedisService;
 import com.le.matrix.redis.facade.IUserService;
@@ -30,7 +30,6 @@ import com.le.matrix.redis.util.RedisHttpClient;
 import com.letv.common.dao.IBaseDao;
 import com.letv.common.email.ITemplateMessageSender;
 import com.letv.common.email.bean.MailMessage;
-import com.letv.common.exception.ValidateException;
 import com.letv.common.paging.impl.Page;
 import com.letv.common.result.ApiResultObject;
 
@@ -55,6 +54,9 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	
 	@Autowired
 	private ITemplateMessageSender defaultEmailSender;
+	
+	@Autowired
+	private RedisHttpClient redisHttpClient;
 	
 	public RedisServiceImpl() {
 		super(Redis.class);
@@ -112,20 +114,39 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ret.put("id", redis.getId());
 		ret.put("serviceId", redis.getServiceId());
 		ret.put("name", instance.get("name"));
-		ret.put("status", instance.get("status"));
+		ret.put("status", tranferStatus((Integer)instance.get("status")));
 		ret.put("type", redis.getType());
 		ret.put("memorySize", instance.get("memSize"));
 		ret.put("createTime", instance.get("createTime"));
 		
 		ret.put("domain", instance.get("domain")==null ? null : JSONObject.parseArray((String) instance.get("domain")));
-		ret.put("clusterId", instance.get("clusterId"));
-		ret.put("clusterName", instance.get("clusterName"));
 		ret.put("configId", instance.get("configFile"));
 		ret.put("configName", instance.get("configFileName"));
 		ret.put("region", instance.get("region"));
 		ret.put("regionCNname", instance.get("regionCNname"));
 		ret.put("azId", instance.get("availableZoneId"));
 		ret.put("azName", instance.get("availableZoneName"));
+		ret.put("port", instance.get("port"));
+	}
+	
+	private Status tranferStatus(int redisStatus) {
+		Status s = null;
+		if(2 == redisStatus) {//运行中
+			s = Status.RUNNING;
+		} else if(3 == redisStatus) {//下线
+			s = Status.STOPED;
+		} else if(5 == redisStatus || 6 == redisStatus) {//新建或创建中
+			s = Status.BUILDDING;
+		} else if(7 == redisStatus) {//实例异常
+			s = Status.CRISIS;
+		} else if(8 == redisStatus) {//创建失败
+			s = Status.BUILDFAIL;
+		} else if(9 == redisStatus) {//启动中
+			s = Status.STARTING;
+		} else {//未知
+			s = Status.UNKNOWN;
+		}
+		return s;
 	}
 	
 	/**
@@ -137,7 +158,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ret.put("id", redis.getId());
 		ret.put("serviceId", redis.getServiceId());
 		ret.put("name", redis.getName());
-		ret.put("status", redis.getAuditStatus().getValue());
+		ret.put("status", redis.getStatus());
 		ret.put("type", redis.getType());
 		ret.put("memorySize", redis.getMemorySize());
 		ret.put("createTime", redis.getCreateTime());
@@ -151,6 +172,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ret.put("regionCNname", regionInfo.get("regionCNname"));
 		ret.put("azId", redis.getAzId());
 		ret.put("azName", getAzName(Long.parseLong(redis.getAzId())));
+		ret.put("port", null);
 	}
 	
 	@Override
@@ -197,37 +219,37 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	
 	@Override
 	public ApiResultObject getReidsRegion() {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+"/redis/region/list");
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl+"/redis/region/list");
 		return apiResult;
 	}
 	
 	@Override
 	public ApiResultObject getRegionByRegionId(Long regionId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+StringUtils.replace("/redis/region/{}", "{}", String.valueOf(regionId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl+StringUtils.replace("/redis/region/{}", "{}", String.valueOf(regionId)));
 		return apiResult;
 	}
 	
 	@Override
 	public ApiResultObject getAzByAzId(Long azId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+StringUtils.replace("/redis/availableZone/{}", "{}", String.valueOf(azId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl+StringUtils.replace("/redis/availableZone/{}", "{}", String.valueOf(azId)));
 		return apiResult;
 	}
 	
 	@Override
 	public ApiResultObject getReidsRegionAz(Long regionId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+StringUtils.replace("/redis/region/{}/availableZone", "{}", String.valueOf(regionId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl+StringUtils.replace("/redis/region/{}/availableZone", "{}", String.valueOf(regionId)));
 		return apiResult;
 	}
 
 	@Override
 	public ApiResultObject getReidsConfig() {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl+"/redis/config/list");
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl+"/redis/config/list");
 		return apiResult;
 	}
 	
 	@Override
 	public ApiResultObject getReidsConfigByConfigId(Long configId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/config/{}", "{}", String.valueOf(configId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/config/{}", "{}", String.valueOf(configId)));
 		return apiResult;
 	}
 
@@ -235,8 +257,18 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	public ApiResultObject checkNameExist(String name) {
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("name", name);
-		ApiResultObject apiResult = RedisHttpClient.post(redisUrl+"/redis/service/checkNameExist", params);
+		ApiResultObject apiResult = redisHttpClient.post(redisUrl+"/redis/service/checkNameExist", params);
+		analyzeNameExistResult(apiResult);
 		return apiResult;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void analyzeNameExistResult(ApiResultObject apiResult) {
+		if(apiResult.getAnalyzeResult()) {
+			Map<String, Object> resultMap = JSONObject.parseObject(apiResult.getResult(), Map.class);
+			Boolean canCreate = (Boolean) resultMap.get("exist");
+			apiResult.setAnalyzeResult(!canCreate);
+		}
 	}
 	
 	@Override
@@ -244,7 +276,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("zoneId", String.valueOf(azId));
 		params.put("memSize", String.valueOf(memorySize));
-		ApiResultObject apiResult = RedisHttpClient.post(redisUrl+"/redis/service/checkCanCreate", params);
+		ApiResultObject apiResult = redisHttpClient.post(redisUrl+"/redis/service/checkCanCreate", params);
 		analyzeCanCreateResult(apiResult);
 		return apiResult;
 	}
@@ -259,8 +291,16 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public ApiResultObject getStatusByServiceId(Long serviceId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/status", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/status", "{}", String.valueOf(serviceId)));
+		Map<String, Object> resultMap = JSONObject.parseObject(apiResult.getResult(), Map.class);
+		Object status = resultMap.get("status");
+		if(null != status) {
+			Status s = tranferStatus((Integer)status);
+			resultMap.put("status", s);
+			apiResult.setResult(JSONObject.toJSONString(resultMap));
+		}
 		return apiResult;
 	}
 	
@@ -276,7 +316,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		if(apiResult.getAnalyzeResult()) {
 			Map<String, Object> resultMap = JSONObject.parseObject(apiResult.getResult(), Map.class);
 			Object status = resultMap.get("status");
-			if(null != status && 2 != (Integer)status) {
+			if(null != status && Status.RUNNING != (Status)status) {
 				apiResult.setAnalyzeResult(false);
 			}
 		}
@@ -284,25 +324,25 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 
 	@Override
 	public ApiResultObject getInstanceByServiceId(Long serviceId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 
 	@Override
 	public ApiResultObject offline(Long serviceId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/offline", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/offline", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 
 	@Override
 	public ApiResultObject start(Long serviceId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/start", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/start", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 	
 	@Override
 	public ApiResultObject deleteInstance(Long serviceId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/delete", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/delete", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 
@@ -313,10 +353,10 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ApiResultObject apiResult = null;
 		//如果redis服务端创建失败后，重试时需要调用“reCreate”接口
 		if(StringUtils.isNotEmpty(redis.getServiceId())) {
-			apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/reCreate", "{}", redis.getServiceId()));
+			apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/reCreate", "{}", redis.getServiceId()));
 			analyzeReCreateResult(apiResult);
 		} else {
-			apiResult = RedisHttpClient.post(redisUrl+"/redis/service/save", params);
+			apiResult = redisHttpClient.post(redisUrl+"/redis/service/save", params);
 			//变更为符合工作流模板方式
 			analyzeCreateResult(apiResult);
 		}
@@ -325,13 +365,13 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	
 	@Override
 	public ApiResultObject createDomain(String serviceId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/createDomain", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/createDomain", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 	
 	@Override
 	public ApiResultObject publishDomain(String serviceId) {
-		ApiResultObject apiResult = RedisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/publishDomain", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/publishDomain", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 	
@@ -355,22 +395,27 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@Override
-	public void build(Redis redis) {
+	public ApiResultObject build(Redis redis) {
+		ApiResultObject apiResult = new ApiResultObject();
 		User u = userService.getUserById(redis.getCreateUser());
 		
 		if(LockUtil.getDistributedLock(String.valueOf(u.getId()))) {//获取到分布式锁
 			boolean checkResult = quotaUserService.checkQuota(redis.getCreateUser(), Constant.QUOTA_REDIS_NAME, Constant.QUOTA_REDIS_TYPE, 1l);
 			if(checkResult) {
-				auditAndBuild(redis, null, null);
+				auditAndBuild(redis, null, null, apiResult);
 			} else {
 				//发送邮件 进行审批
 				sendAuditEmail(redis, u);
+				apiResult.setAnalyzeResult(true);
+				apiResult.setResult("超过配额，等待管理员审核通过...");
 			}
 			//释放锁
 			LockUtil.releaseDistributedLock(String.valueOf(u.getId()));
 		} else {
-			throw new ValidateException("服务器正忙,请稍后重试!");
+			apiResult.setAnalyzeResult(false);
+			apiResult.setResult("服务器正忙,请稍后重试!");
 		}
+		return apiResult;
 	}
 	
 	private void sendAuditEmail(Redis redis, User u) {
@@ -385,16 +430,19 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@Override
-	public void auditAndBuild(Long id, String auditInfo, Long auditUser) {
+	public ApiResultObject auditAndBuild(Long id, String auditInfo, Long auditUser) {
+		ApiResultObject apiResult = new ApiResultObject();
 		Redis redis = this.selectById(id);
-		if(redis.getAuditStatus()==AuditStatus.WAIT) {//待审核状态才进行创建
-			auditAndBuild(redis, auditInfo, auditUser);
+		if(redis.getStatus()==Status.PENDING) {//待审核状态才进行创建
+			auditAndBuild(redis, auditInfo, auditUser, apiResult);
 		} else {
-			throw new ValidateException("状态无法审核");
+			apiResult.setAnalyzeResult(false);
+			apiResult.setResult("状态无法审核通过!");
 		}
+		return apiResult;
 	}
 	
-	public void auditAndBuild(Redis redis, String auditInfo, Long auditUser) {
+	public void auditAndBuild(Redis redis, String auditInfo, Long auditUser, ApiResultObject apiResult) {
 		if(LockUtil.getDistributedLock("createOrDeleteRedis")) {
 			User u = userService.getUserById(redis.getCreateUser());
 			//校验redis服务是否合法
@@ -418,12 +466,24 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 				updateQuotaUser(redis.getCreateUser(), 1);
 				
 				//更新redis信息
-				updateRedisAudit(redis, auditInfo, auditUser, AuditStatus.APPROVE);
+				updateRedisAudit(redis, auditInfo, auditUser, Status.APPROVE);
+				
+				apiResult.setAnalyzeResult(true);
+				apiResult.setResult("{\"approve\":true}");
+			} else {
+				apiResult.setAnalyzeResult(false);
+				if(!nameCheckResult.getAnalyzeResult()) {
+					apiResult.setResult("名称已存在!");
+				} else if(!canCreateCheckResult.getAnalyzeResult()) {
+					apiResult.setResult("资源无法创建!");
+				}
+				
 			}
 			
 			LockUtil.releaseDistributedLock("createOrDeleteRedis");
 		} else {
-			throw new ValidateException("服务器正忙,请稍后重试!");
+			apiResult.setAnalyzeResult(false);
+			apiResult.setResult("服务器正忙,请稍后重试!");
 		}
 		
 	}
@@ -436,18 +496,23 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@Override
-	public void reject(Long id, String auditInfo, Long auditUser) {
+	public ApiResultObject reject(Long id, String auditInfo, Long auditUser) {
+		ApiResultObject apiResult = new ApiResultObject();
 		Redis redis = this.selectById(id);
-		if(redis.getAuditStatus()==AuditStatus.WAIT) {//待审核状态才进行驳回
-			updateRedisAudit(redis, auditInfo, auditUser, AuditStatus.REJECT);
+		if(redis.getStatus()==Status.PENDING) {//待审核状态才进行驳回
+			updateRedisAudit(redis, auditInfo, auditUser, Status.REJECT);
+			apiResult.setAnalyzeResult(true);
+			apiResult.setResult("{\"reject\":true}");
 		} else {
-			throw new ValidateException("状态无法驳回");
+			apiResult.setAnalyzeResult(false);
+			apiResult.setResult("状态无法驳回!");
 		}
+		return apiResult;
 	}
 	
-	private void updateRedisAudit(Redis redis, String auditInfo, Long auditUser, AuditStatus auditStatus) {
+	private void updateRedisAudit(Redis redis, String auditInfo, Long auditUser, Status status) {
 		redis.setAuditInfo(auditInfo);
-		redis.setAuditStatus(auditStatus);
+		redis.setStatus(status);
 		redis.setAuditUser(auditUser);
 		redis.setAuditTime(new Date());
 		this.redisDao.updateBySelective(redis);
@@ -524,6 +589,17 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 			apiResult.setAnalyzeResult(false);
 			apiResult.setResult("获取分布式锁失败");
 		}
+		return apiResult;
+	}
+	
+	@Override
+	public ApiResultObject queryPendingRedis(Page p) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("status", Status.PENDING);//待审核
+		Page page = queryByPagination(p, params);
+		ApiResultObject apiResult = new ApiResultObject();
+		apiResult.setAnalyzeResult(true);
+		apiResult.setResult(JSONObject.toJSONString(page));
 		return apiResult;
 	}
 	

@@ -7,44 +7,49 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.le.matrix.redis.constant.Constant;
 import com.le.matrix.redis.model.RESTfulResult;
 import com.letv.common.result.ApiResultObject;
 
-@Component
+@Service("redisHttpClient")
 public class RedisHttpClient {
+	
+	@Value("${redis.auth.name}")
+	public String REDIS_AUTH_NAME;
+	@Value("${redis.auth.token}")
+	public String REDIS_AUTH_TOKEN;
 	
 	private final static Logger logger = LoggerFactory.getLogger(RedisHttpClient.class);
 	
-	public static ApiResultObject postObject(String url, Object obj) {
+	public ApiResultObject postObject(String url, Object obj) {
 		RESTfulResult restfulResult = StatusHttpClient.postObject(url, obj, Constant.CONNECTION_TIMEOUT, 
 				Constant.SO_TIMEOUT, getHttpHeader());
 		return analyzeHttpStatusRESTfulResult(restfulResult);
 	}
 	
-	public static ApiResultObject post(String url, Map<String, String> params) {
+	public ApiResultObject post(String url, Map<String, String> params) {
 		RESTfulResult restfulResult = StatusHttpClient.post(url, params, Constant.CONNECTION_TIMEOUT, 
 				Constant.SO_TIMEOUT, getHttpHeader());
 		return analyzeHttpStatusRESTfulResult(restfulResult);
 	}
 	
-	public static ApiResultObject get(String url) {
+	public ApiResultObject get(String url) {
 		RESTfulResult restfulResult = StatusHttpClient.get(url, Constant.CONNECTION_TIMEOUT, 
 				Constant.SO_TIMEOUT, getHttpHeader());
 		return analyzeHttpStatusRESTfulResult(restfulResult);
 	}
 	
-	private static Map<String, String> getHttpHeader() {
+	private Map<String, String> getHttpHeader() {
 		Map<String, String> headers = new HashMap<String, String>();
-		headers.put("name", Constant.REDIS_NAME);
-		headers.put("token", Constant.REDIS_TOKEN);
+		headers.put("name", REDIS_AUTH_NAME);
+		headers.put("token", REDIS_AUTH_TOKEN);
 		return headers;
 	}
 	
-	public static ApiResultObject analyzeHttpStatusRESTfulResult(RESTfulResult result) {
+	public ApiResultObject analyzeHttpStatusRESTfulResult(RESTfulResult result) {
 		logger.debug("Analyze RESTfulResult:{}", result);
 		ApiResultObject aipResultObject = new ApiResultObject();
 		
@@ -63,7 +68,7 @@ public class RedisHttpClient {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static void redisResultCheck(RESTfulResult result, ApiResultObject aipResultObject) {
+	private void redisResultCheck(RESTfulResult result, ApiResultObject aipResultObject) {
 		Map<String, Object> resultMap = JSONObject.parseObject(result.getBody(), Map.class);
 		
 		//业务逻辑检查,返回的code=200时,任务业务逻辑成功

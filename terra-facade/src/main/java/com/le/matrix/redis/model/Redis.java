@@ -2,7 +2,7 @@ package com.le.matrix.redis.model;
 
 import java.util.Date;
 
-import com.le.matrix.redis.enumeration.AuditStatus;
+import com.le.matrix.redis.enumeration.Status;
 import com.le.matrix.redis.enumeration.RedisType;
 import com.letv.common.model.BaseModel;
 
@@ -26,7 +26,7 @@ public class Redis extends BaseModel {
 
 	private String serviceId;//服务id
 	
-	private AuditStatus auditStatus;//审核状态
+	private Status status;//状态：1-待审核，2-审核通过，3-驳回，4-创建中，5-创建失败，6-启动中，7-启动失败，8-运行中，9-停止中，10-已停止，11-危险，12-宕机，13-集群删除中，14-集群已删除，15-集群删除失败
 	
 	private String auditInfo;//审核信息
 	
@@ -49,14 +49,15 @@ public class Redis extends BaseModel {
 		this.regionId = regionId;
 	}
 
-
-	public AuditStatus getAuditStatus() {
-		return auditStatus;
+	public Status getStatus() {
+		return status;
 	}
 
-	public void setAuditStatus(AuditStatus auditStatus) {
-		this.auditStatus = auditStatus;
+
+	public void setStatus(Status status) {
+		this.status = status;
 	}
+
 
 	public String getAuditInfo() {
 		return auditInfo;
