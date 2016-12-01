@@ -176,6 +176,14 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject publishDomain(@QueryParam("serviceId") String serviceId);
 	
 	/**
+	 * 根据serviceId查询发布状态
+	 * @return
+	 */
+	@GET
+	@Path("/domainStatus")
+	ApiResultObject getDomainStatus(@QueryParam("serviceId") String serviceId);
+	
+	/**
 	 * 检查并调用工作流
 	 * @param redis
 	 * @return

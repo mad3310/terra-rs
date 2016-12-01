@@ -119,7 +119,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ret.put("memorySize", instance.get("memSize"));
 		ret.put("createTime", instance.get("createTime"));
 		
-		ret.put("domain", instance.get("domain")==null ? null : JSONObject.parseArray((String) instance.get("domain")));
+		String domain = (String) instance.get("domain");
+		ret.put("domain", StringUtils.isNotEmpty(domain) ? weaveDomain((String)domain, redis.getServiceId()) : "");
 		ret.put("configId", instance.get("configFile"));
 		ret.put("configName", instance.get("configFileName"));
 		ret.put("region", instance.get("region"));
@@ -147,6 +148,24 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 			s = Status.UNKNOWN;
 		}
 		return s;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private List<Map> weaveDomain(String domain, String serviceId) {
+		List<Map> domains = JSONObject.parseArray(domain, Map.class);
+		ApiResultObject apiResult = getDomainStatus(serviceId);
+		if(apiResult.getAnalyzeResult()) {
+			List<Map> domainStatus = JSONObject.parseArray(apiResult.getResult(), Map.class);
+			Map<String, Object> domainMap = new HashMap<String, Object>();
+			for (Map map : domainStatus) {
+				domainMap.put((String)map.get("domain"), map.get("isPublished"));
+			}
+			for (Map info : domains) {
+				info.put("isPublished", domainMap.get(info.get("domain")));
+			}
+		}
+		
+		return domains;
 	}
 	
 	/**
@@ -316,7 +335,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		if(apiResult.getAnalyzeResult()) {
 			Map<String, Object> resultMap = JSONObject.parseObject(apiResult.getResult(), Map.class);
 			Object status = resultMap.get("status");
-			if(null != status && Status.RUNNING != (Status)status) {
+			if(null != status && !Status.RUNNING.name().equals((String)status)) {
 				apiResult.setAnalyzeResult(false);
 			}
 		}
@@ -365,13 +384,19 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	
 	@Override
 	public ApiResultObject createDomain(String serviceId) {
-		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/createDomain", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/createDomain", "{}", serviceId));
 		return apiResult;
 	}
 	
 	@Override
 	public ApiResultObject publishDomain(String serviceId) {
-		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/publishDomain", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/publishDomain", "{}", serviceId));
+		return apiResult;
+	}
+	
+	@Override
+	public ApiResultObject getDomainStatus(String serviceId) {
+		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/domain/{}/domainStatus", "{}", serviceId));
 		return apiResult;
 	}
 	

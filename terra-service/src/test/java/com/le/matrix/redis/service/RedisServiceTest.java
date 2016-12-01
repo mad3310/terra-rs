@@ -40,7 +40,6 @@ public class RedisServiceTest extends AbstractTest{
     	r.setName("junitTest"+System.currentTimeMillis());
     	r.setMemorySize(5);
     	r.setType(RedisType.RedisCluster);
-    	r.setClusterId("test_cluster_id");
     	r.setConfigId("test_config_id");
     	r.setDescn("test_descn");
     	redisService.insert(r);
