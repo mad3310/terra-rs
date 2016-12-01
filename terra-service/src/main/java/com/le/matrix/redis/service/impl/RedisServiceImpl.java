@@ -604,9 +604,11 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ApiResultObject apiResult = new ApiResultObject();
 		Redis r = this.selectById(id);
 		if(LockUtil.getDistributedLock("createOrDeleteRedis")) {//获取到分布式锁
-			deleteInstance(Long.parseLong(r.getServiceId()));
+			if(StringUtils.isNotEmpty(r.getServiceId())) {
+				deleteInstance(Long.parseLong(r.getServiceId()));
+				updateQuotaUser(r.getCreateUser(), -1);
+			}
 			delete(r);
-			updateQuotaUser(r.getCreateUser(), -1);
 			//释放锁
 			LockUtil.releaseDistributedLock("createOrDeleteRedis");
 			apiResult.setAnalyzeResult(true);
