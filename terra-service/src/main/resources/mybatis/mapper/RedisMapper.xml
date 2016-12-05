@@ -242,7 +242,7 @@
 			<if test="params != null and params.createTime != null  ">
 				and redis.CREATE_TIME=#{params.createTime}
 			</if>
-			<if test="params != null and params.createUser != null  ">
+			<if test="params != null and params.createUser != null and params.createUser != ''  ">
 				and redis.CREATE_USER=#{params.createUser}
 			</if>
 			<if test="params != null and params.updateTime != null  ">
@@ -260,7 +260,7 @@
 			<if test="params != null and params.auditTime != null and params.auditTime != ''  ">
 				and redis.AUDIT_TIME=#{params.auditTime}
 			</if>
-			<if test="params != null and params.auditUser != null  ">
+			<if test="params != null and params.auditUser != null and params.auditUser != ''  ">
 				and redis.AUDIT_USER=#{params.auditUser}
 			</if>
 		</trim>

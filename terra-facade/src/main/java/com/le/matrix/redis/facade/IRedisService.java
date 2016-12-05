@@ -15,7 +15,6 @@ import javax.ws.rs.core.MediaType;
 
 import com.alibaba.dubbo.rpc.protocol.rest.support.ContentType;
 import com.le.matrix.redis.model.Redis;
-import com.letv.common.paging.impl.Page;
 import com.letv.common.result.ApiResultObject;
 
 @Path("redis")
@@ -234,8 +233,8 @@ public interface IRedisService extends IBaseService<Redis> {
 	ApiResultObject sendUserEmail(@QueryParam("id") Long id);
 	
 	@POST
-	@Path("/pending")
-	ApiResultObject queryPendingRedis(Page p);
+	@Path("/list")
+	ApiResultObject queryRedisList(Map<String, Object> params);
 	
 	
 }

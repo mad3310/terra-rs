@@ -70,7 +70,13 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	@SuppressWarnings("unchecked")
 	@Override
 	public <K, V> Page queryByPagination(Page page, Map<K, V> params) {
-		Page p = super.queryByPagination(page, params);
+		Map<String, Object> ps = (Map<String, Object>) params;
+		if(StringUtils.isNotEmpty((String)ps.get("status"))) {
+			Status status = Status.valueOf((String)ps.get("status"));
+			ps.put("status", status);
+		}
+		
+		Page p = super.queryByPagination(page, ps);
 		List<Redis> rediss = (List<Redis>) p.getData();
 		List<Map<String, Object>> rets = new ArrayList<Map<String, Object>>();
 		for (Redis redis : rediss) {
@@ -102,12 +108,14 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	@SuppressWarnings("unchecked")
 	private void useRemoteService(Redis redis, Map<String, Object> ret) {
 		ApiResultObject apiResult = this.getInstanceByServiceId(Long.parseLong(redis.getServiceId()));
+		Map<String, Object> info = null;
 		Map<String, Object> instance = null;
 		if(apiResult.getAnalyzeResult()) {
 			List<Object> instances = JSONObject.parseArray(apiResult.getResult());
-			Map<String, Object> info = (Map<String, Object>) instances.get(0);
+			info = (Map<String, Object>) instances.get(0);
 			instance = (Map<String, Object>) info.get("appDesc");
 		} else {
+			info = new HashMap<String, Object>();
 			instance = new HashMap<String, Object>();
 		}
 		
@@ -128,6 +136,9 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ret.put("azId", instance.get("availableZoneId"));
 		ret.put("azName", instance.get("availableZoneName"));
 		ret.put("port", instance.get("port"));
+		ret.put("username", instance.get("officer"));
+		ret.put("auditInfo", redis.getAuditInfo());
+		ret.put("memUsePercent", info.get("memUsePercent"));
 	}
 	
 	private Status tranferStatus(int redisStatus) {
@@ -192,6 +203,15 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		ret.put("azId", redis.getAzId());
 		ret.put("azName", getAzName(Long.parseLong(redis.getAzId())));
 		ret.put("port", null);
+		
+		ret.put("username", getUsername(redis.getCreateUser()));
+		ret.put("auditInfo", redis.getAuditInfo());
+		ret.put("memUsePercent", null);
+	}
+	
+	private String getUsername(Long userId) {
+		User u = userService.getUserById(userId);
+		return u.getUserName();
 	}
 	
 	@Override
@@ -620,9 +640,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	}
 	
 	@Override
-	public ApiResultObject queryPendingRedis(Page p) {
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put("status", Status.PENDING);//待审核
+	public ApiResultObject queryRedisList(Map<String, Object> params) {
+		Page p = new Page((Integer)params.get("currentPage"), (Integer)params.get("recordsPerPage"));
 		Page page = queryByPagination(p, params);
 		ApiResultObject apiResult = new ApiResultObject();
 		apiResult.setAnalyzeResult(true);
