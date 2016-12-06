@@ -192,20 +192,26 @@ public class StatusHttpClient {
 	
 	public static RESTfulResult delete(String url, Map<String, String> params,
 			String username, String password) {
-		return delete(url, params, username, password, null);
+		return delete(url, params, 0, 0, username, password, null);
 	}
 	
 	public static RESTfulResult delete(String url, String username, String password) {
-		return delete(url, null, username, password, null);
+		return delete(url, null, 0, 0, username, password, null);
 	}
 	
 	public static RESTfulResult delete(String url, Map<String, String> headers) {
-		return delete(url, null, null, null, headers);
+		return delete(url, null, 0, 0, null, null, headers);
+	}
+	
+	public static RESTfulResult delete(String url, int connectionTimeout, int soTimeout, Map<String, String> headers) {
+		return delete(url, null, connectionTimeout, soTimeout, null, null, headers);
 	}
 
-	public static RESTfulResult delete(String url, Map<String, String> params, String username, String password, 
+	public static RESTfulResult delete(String url, Map<String, String> params, int connectionTimeout, int soTimeout,
+			String username, String password, 
 			Map<String, String> headers) {
-		DefaultHttpClient httpclient = getHttpclient(username, password);
+		DefaultHttpClient httpclient = getHttpclient(connectionTimeout,
+				soTimeout, username, password);
 		HttpUriRequest delete = null;
 		if(null == params) {
 			logger.info("create httpdelete:" + url);

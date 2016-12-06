@@ -42,6 +42,12 @@ public class RedisHttpClient {
 		return analyzeHttpStatusRESTfulResult(restfulResult);
 	}
 	
+	public ApiResultObject delete(String url) {
+		RESTfulResult restfulResult = StatusHttpClient.delete(url, Constant.CONNECTION_TIMEOUT, 
+				Constant.SO_TIMEOUT, getHttpHeader());
+		return analyzeHttpStatusRESTfulResult(restfulResult);
+	}
+	
 	private Map<String, String> getHttpHeader() {
 		Map<String, String> headers = new HashMap<String, String>();
 		headers.put("name", REDIS_AUTH_NAME);

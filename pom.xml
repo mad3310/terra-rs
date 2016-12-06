@@ -54,7 +54,7 @@
 	            <db.username>webportal</db.username>
 	            <db.password>H6ZMvaimaKGyrwRb4u7tAIjTTGflemmWySrZwT/lt51IkVR7+WrwhNdAZcnO4WjQJp6NH2KO1++qjblh8Y12fg==</db.password>
 	
-				<dubbo.registry.zkAddr>10.185.81.18:2181,10.185.81.141:2181,10.185.81.144:2181</dubbo.registry.zkAddr>
+				<dubbo.registry.zkAddr>10.185.81.160:2181,10.185.81.240:2181,10.185.81.244:2181</dubbo.registry.zkAddr>
 				<dubbo.protocol.server>servlet</dubbo.protocol.server>
 				
 				<oauth.auth.http>https://login.lecloud.com</oauth.auth.http>

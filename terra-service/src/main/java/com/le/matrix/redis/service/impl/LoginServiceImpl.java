@@ -86,8 +86,8 @@ public class LoginServiceImpl implements ILoginService {
 		String username = (String) oauthUser.get("username");
 		String email = (String) oauthUser.get("email");
 		
-		if(email.endsWith("le.com"))
-			email = email.replace("le.com","letv.com");
+		if(email.endsWith("letv.com"))
+			email = email.replace("letv.com","le.com");
 
 		session.setUserName(username);
 		session.setEmail(email);

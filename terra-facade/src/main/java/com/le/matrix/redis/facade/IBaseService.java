@@ -79,6 +79,8 @@ public interface IBaseService<T> {
 	 * @return
 	 * @throws Exception
 	 */
+	@POST
+	@Path("count")
 	<K, V> Integer selectByMapCount(Map<K, V> map);
 
 	/**

@@ -28,6 +28,7 @@ import com.le.matrix.redis.model.User;
 import com.le.matrix.redis.util.LockUtil;
 import com.le.matrix.redis.util.RedisHttpClient;
 import com.letv.common.dao.IBaseDao;
+import com.letv.common.dao.QueryParam;
 import com.letv.common.email.ITemplateMessageSender;
 import com.letv.common.email.bean.MailMessage;
 import com.letv.common.paging.impl.Page;
@@ -381,7 +382,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	
 	@Override
 	public ApiResultObject deleteInstance(Long serviceId) {
-		ApiResultObject apiResult = redisHttpClient.get(redisUrl + StringUtils.replace("/redis/service/{}/delete", "{}", String.valueOf(serviceId)));
+		ApiResultObject apiResult = redisHttpClient.delete(redisUrl + StringUtils.replace("/redis/service/{}/delete", "{}", String.valueOf(serviceId)));
 		return apiResult;
 	}
 
@@ -625,7 +626,12 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		Redis r = this.selectById(id);
 		if(LockUtil.getDistributedLock("createOrDeleteRedis")) {//获取到分布式锁
 			if(StringUtils.isNotEmpty(r.getServiceId())) {
-				deleteInstance(Long.parseLong(r.getServiceId()));
+				ApiResultObject result = deleteInstance(Long.parseLong(r.getServiceId()));
+				if(!result.getAnalyzeResult()) {
+					//释放锁
+					LockUtil.releaseDistributedLock("createOrDeleteRedis");
+					return result;
+				}
 				updateQuotaUser(r.getCreateUser(), -1);
 			}
 			delete(r);
@@ -647,6 +653,14 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 		apiResult.setAnalyzeResult(true);
 		apiResult.setResult(JSONObject.toJSONString(page));
 		return apiResult;
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public <K, V> Integer selectByMapCount(Map<K, V> map) {
+		QueryParam param = new QueryParam();
+		param.setParams(map);
+		return this.redisDao.selectByMapCount(param);
 	}
 	
 	
