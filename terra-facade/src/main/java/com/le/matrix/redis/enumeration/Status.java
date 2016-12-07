@@ -17,7 +17,9 @@ public enum Status implements IntEnum{
 	CRISIS(12),//宕机，集群不可用
 	DESTROYING(13),//集群删除中
 	DESTROYED(14),//集群已删除
-	DESTROYFAILED(15);//集群删除失败
+	DESTROYFAILED(15),//集群删除失败
+	
+	EXCEPTION(16);//数据异常
 	
 	private final Integer value;
 	

@@ -31,6 +31,7 @@ import com.letv.common.dao.IBaseDao;
 import com.letv.common.dao.QueryParam;
 import com.letv.common.email.ITemplateMessageSender;
 import com.letv.common.email.bean.MailMessage;
+import com.letv.common.exception.ValidateException;
 import com.letv.common.paging.impl.Page;
 import com.letv.common.result.ApiResultObject;
 
@@ -115,20 +116,21 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 			List<Object> instances = JSONObject.parseArray(apiResult.getResult());
 			info = (Map<String, Object>) instances.get(0);
 			instance = (Map<String, Object>) info.get("appDesc");
-		} else {
-			info = new HashMap<String, Object>();
-			instance = new HashMap<String, Object>();
+		} else {//请求失败后提示用户该条数据异常
+			useDbInfo(redis, ret);
+			ret.put("status", Status.EXCEPTION);
+			return;
 		}
 		
 		ret.put("id", redis.getId());
 		ret.put("serviceId", redis.getServiceId());
 		ret.put("name", instance.get("name"));
-		ret.put("status", tranferStatus((Integer)instance.get("status")));
+		ret.put("status", null==instance.get("status") ? null : tranferStatus((Integer)instance.get("status")));
 		ret.put("type", redis.getType());
 		ret.put("memorySize", instance.get("memSize"));
 		ret.put("createTime", instance.get("createTime"));
 		
-		String domain = (String) instance.get("domain");
+		String domain = null==instance.get("domain") ? null : (String) instance.get("domain");
 		ret.put("domain", StringUtils.isNotEmpty(domain) ? weaveDomain((String)domain, redis.getServiceId()) : "");
 		ret.put("configId", instance.get("configFile"));
 		ret.put("configName", instance.get("configFileName"));
