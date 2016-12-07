@@ -27,6 +27,8 @@
 				<dubbo.protocol.server>jetty</dubbo.protocol.server>
 				
 				<oauth.auth.http>https://login.lecloud.com</oauth.auth.http>
+				<dubbo.protocol.port.dubbo>20881</dubbo.protocol.port.dubbo>
+	            <dubbo.protocol.port.rest>8888</dubbo.protocol.port.rest>
 	
 	            <webportal.errormail.to>lisuxiao@le.com</webportal.errormail.to>
 	            <service.notice.email.to>lisuxiao@le.com</service.notice.email.to>
@@ -58,6 +60,8 @@
 				<dubbo.protocol.server>servlet</dubbo.protocol.server>
 				
 				<oauth.auth.http>https://login.lecloud.com</oauth.auth.http>
+				<dubbo.protocol.port.dubbo>20881</dubbo.protocol.port.dubbo>
+	            <dubbo.protocol.port.rest>8080</dubbo.protocol.port.rest>
 	
 	            <webportal.errormail.to>lisuxiao@le.com;linzhanbo@le.com;zhangtao8@le.com</webportal.errormail.to>
 	            <service.notice.email.to>lisuxiao@le.com;linzhanbo@le.com;zhangtao8@le.com</service.notice.email.to>
@@ -88,6 +92,8 @@
 				<dubbo.protocol.server>servlet</dubbo.protocol.server>
 				
 				<oauth.auth.http>https://login.lecloud.com</oauth.auth.http>
+				<dubbo.protocol.port.dubbo>20881</dubbo.protocol.port.dubbo>
+	            <dubbo.protocol.port.rest>8080</dubbo.protocol.port.rest>
 	            
 	            <!-- 使用邮件组无法识别，暂时使用邮箱名 -->
 	            <webportal.errormail.to>lisuxiao@le.com;linzhanbo@le.com;zhoubingzheng@le.com</webportal.errormail.to>

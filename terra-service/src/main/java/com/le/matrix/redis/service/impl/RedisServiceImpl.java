@@ -383,7 +383,17 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 	@Override
 	public ApiResultObject deleteInstance(Long serviceId) {
 		ApiResultObject apiResult = redisHttpClient.delete(redisUrl + StringUtils.replace("/redis/service/{}/delete", "{}", String.valueOf(serviceId)));
+		analyzedeleteInstanceResult(apiResult);
 		return apiResult;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private void analyzedeleteInstanceResult(ApiResultObject apiResult) {
+		if(apiResult.getAnalyzeResult()) {
+			Map<String, Object> resultMap = JSONObject.parseObject(apiResult.getResult(), Map.class);
+			Boolean delete = (Boolean) resultMap.get("delete");
+			apiResult.setAnalyzeResult(delete);
+		}
 	}
 
 	@Override
@@ -506,6 +516,8 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 				map.put("config", redis.getConfigId());
 				map.put("password", redis.getPassword());
 				map.put("zoneId", redis.getAzId());
+				map.put("serviceName", redis.getName());
+				map.put("clusterName", u.getId()+redis.getName());
 				this.taskEngine.run("REDIS_CREATE", map);
 				
 				//更新配额使用量
