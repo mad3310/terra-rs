@@ -519,7 +519,7 @@ public class RedisServiceImpl extends BaseServiceImpl<Redis> implements IRedisSe
 				map.put("password", redis.getPassword());
 				map.put("zoneId", redis.getAzId());
 				map.put("serviceName", redis.getName());
-				map.put("clusterName", u.getId()+redis.getName());
+				map.put("clusterName", u.getId()+"_"+redis.getName());
 				this.taskEngine.run("REDIS_CREATE", map);
 				
 				//更新配额使用量
