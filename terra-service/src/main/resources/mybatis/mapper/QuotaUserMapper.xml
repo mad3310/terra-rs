@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.le.matrix.redis.dao.IQuotaUserDao">
+	<resultMap id="BaseResultMap" type="com.le.matrix.redis.model.QuotaUser">
+		<id column="ID" jdbcType="BIGINT" property="id" />
+		<result column="USED" jdbcType="BIGINT" property="used" />
+		<result column="QUOTA_BASE_ID" jdbcType="BIGINT" property="quotaBaseId" />
+		<result column="DESCN" jdbcType="VARCHAR" property="descn" />
+		<result column="DELETED" jdbcType="TINYINT" property="deleted" />
+		<result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime" />
+		<result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime" />
+		<result column="CREATE_USER" jdbcType="BIGINT" property="createUser" />
+		<result column="UPDATE_USER" jdbcType="BIGINT" property="updateUser" />
+
+		<association property="quotaBase" javaType="QuotaBase">
+			<result column="NAME" jdbcType="VARCHAR" property="name" />
+			<result column="TYPE" jdbcType="VARCHAR" property="type" />
+			<result column="VALUE" jdbcType="BIGINT" property="value" />
+		</association>
+	</resultMap>
+	<sql id="Base_Column_List">
+		quotaUser.ID, quotaUser.USED, quotaUser.QUOTA_BASE_ID, quotaUser.DESCN, quotaUser.DELETED, quotaUser.CREATE_TIME,
+		quotaUser.UPDATE_TIME,
+		quotaUser.CREATE_USER, quotaUser.UPDATE_USER
+	</sql>
+	
+	<sql id="Common_Where_Clause">
+	    where 1=1
+	    <trim suffixOverrides=",">
+	        <if test="id != null ">
+	            and quotaUser.ID=#{id}
+	        </if>
+	        <if test="used != null ">
+	            and quotaUser.USED=#{used}
+	        </if>
+	        <if test="quotaBaseId != null ">
+	            and quotaUser.QUOTA_BASE_ID=#{quotaBaseId}
+	        </if>
+	        <if test="descn != null ">
+	            and quotaUser.DESCN=#{descn}
+	        </if>
+	        <if test="deleted != null ">
+	            and quotaUser.DELETED=#{deleted}
+	        </if>
+	        <if test="createTime != null ">
+	            and quotaUser.CREATE_TIME=#{createTime}
+	        </if>
+	        <if test="updateTime != null ">
+	            and quotaUser.UPDATE_TIME=#{updateTime}
+	        </if>
+	        <if test="createUser != null ">
+	            and quotaUser.CREATE_USER=#{createUser}
+	        </if>
+	        <if test="updateUser != null ">
+	            and quotaUser.UPDATE_USER=#{updateUser}
+	        </if>
+	    </trim>
+	</sql>
+	<select id="selectById" parameterType="java.lang.Long"
+		resultMap="BaseResultMap">
+		select
+			<include refid="Base_Column_List" />
+		from 
+			TERRA_QUOTA_USER quotaUser
+		where quotaUser.ID = #{id,jdbcType=BIGINT}
+	</select>
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		delete from
+		TERRA_QUOTA_USER
+		where ID = #{id,jdbcType=BIGINT}
+	</delete>
+	<insert id="insert" parameterType="com.le.matrix.redis.model.QuotaUser" useGeneratedKeys="true" keyProperty="id">
+		insert into TERRA_QUOTA_USER
+			(USED, QUOTA_BASE_ID,
+			DESCN, DELETED, CREATE_TIME,
+			UPDATE_TIME,
+			CREATE_USER, UPDATE_USER
+			)
+		values (
+			#{used,jdbcType=BIGINT},
+			#{quotaBaseId,jdbcType=BIGINT},
+			#{descn,jdbcType=VARCHAR}, #{deleted,jdbcType=TINYINT},
+			#{createTime,jdbcType=TIMESTAMP},
+			#{updateTime,jdbcType=TIMESTAMP},
+			#{createUser,jdbcType=BIGINT},
+			#{updateUser,jdbcType=BIGINT}
+			)
+	</insert>
+	<insert id="insertSelective" parameterType="com.le.matrix.redis.model.QuotaUser">
+		insert into TERRA_QUOTA_USER
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				ID,
+			</if>
+			<if test="used != null">
+				USED,
+			</if>
+			<if test="quotaBaseId != null">
+				QUOTA_BASE_ID,
+			</if>
+			<if test="descn != null">
+				DESCN,
+			</if>
+			<if test="deleted != null">
+				DELETED,
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME,
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME,
+			</if>
+			<if test="createUser != null">
+				CREATE_USER,
+			</if>
+			<if test="updateUser != null">
+				UPDATE_USER,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				#{id,jdbcType=BIGINT},
+			</if>
+			<if test="used != null">
+				#{used,jdbcType=BIGINT},
+			</if>
+			<if test="quotaBaseId != null">
+				#{quotaBaseId,jdbcType=BIGINT},
+			</if>
+			<if test="descn != null">
+				#{descn,jdbcType=VARCHAR},
+			</if>
+			<if test="deleted != null">
+				#{deleted,jdbcType=TINYINT},
+			</if>
+			<if test="createTime != null">
+				#{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				#{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createUser != null">
+				#{createUser,jdbcType=BIGINT},
+			</if>
+			<if test="updateUser != null">
+				#{updateUser,jdbcType=BIGINT},
+			</if>
+		</trim>
+	</insert>
+	<update id="updateBySelective" parameterType="com.le.matrix.redis.model.QuotaUser">
+		update TERRA_QUOTA_USER
+		<set>
+			<if test="used != null">
+				USED = #{used,jdbcType=BIGINT},
+			</if>
+			<if test="quotaBaseId != null">
+				QUOTA_BASE_ID = #{quotaBaseId,jdbcType=BIGINT},
+			</if>
+			<if test="descn != null">
+				DESCN = #{descn,jdbcType=VARCHAR},
+			</if>
+			<if test="deleted != null">
+				DELETED = #{deleted,jdbcType=TINYINT},
+			</if>
+			<if test="createTime != null">
+				CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="updateTime != null">
+				UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+			</if>
+			<if test="createUser != null">
+				CREATE_USER = #{createUser,jdbcType=BIGINT},
+			</if>
+			<if test="updateUser != null">
+				UPDATE_USER = #{updateUser,jdbcType=BIGINT},
+			</if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	<update id="updateByPrimaryKey" parameterType="com.le.matrix.redis.model.QuotaUser">
+		update
+			TERRA_QUOTA_USER
+		set 
+			USED = #{used,jdbcType=BIGINT},
+			QUOTA_BASE_ID = #{quotaBaseId,jdbcType=BIGINT},
+			DESCN = #{descn,jdbcType=VARCHAR},
+			DELETED = #{deleted,jdbcType=TINYINT},
+			CREATE_TIME = #{createTime,jdbcType=TIMESTAMP},
+			UPDATE_TIME = #{updateTime,jdbcType=TIMESTAMP},
+			CREATE_USER = #{createUser,jdbcType=BIGINT},
+			UPDATE_USER = #{updateUser,jdbcType=BIGINT}
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map">
+	    select
+	        <include refid="Base_Column_List" />,quotaBase.NAME,quotaBase.TYPE,quotaBase.VALUE
+	    from
+	        TERRA_QUOTA_USER quotaUser
+	    join
+	    	TERRA_QUOTA_BASE quotaBase on quotaUser.QUOTA_BASE_ID=quotaBase.ID
+	        <include refid="Common_Where_Clause" />
+	        <if test="name != null ">
+				and quotaBase.NAME = #{name}
+			</if>
+	        <if test="type != null ">
+				and quotaBase.TYPE = #{type}
+			</if>
+	</select>
+</mapper>

@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.le.matrix.redis.dao.IRedisDao">
+
+	<resultMap id="BaseResultMap" type="Redis">
+	    <result column="ID" property="id" />
+	    <result column="NAME" property="name" />
+	    <result column="TYPE" property="type" jdbcType="TINYINT" typeHandler="com.le.matrix.redis.enumeration.IntValueEnumTypeHandler"/>
+	    <result column="MEMORY_SIZE" property="memorySize" />
+	    <result column="REGION_ID" property="regionId" />
+	    <result column="CONFIG_ID" property="configId" />
+	    <result column="AZ_ID" property="azId" />
+	    <result column="PASSWORD" property="password" />
+	    <result column="SERVICE_ID" property="serviceId" />
+	    <result column="DESCN" property="descn" />
+	    <result column="CREATE_TIME" property="createTime" />
+	    <result column="UPDATE_TIME" property="updateTime" />
+	    <result column="CREATE_USER" property="createUser" />
+	    <result column="UPDATE_USER" property="updateUser" />
+	    <result column="STATUS" property="status" jdbcType="TINYINT" typeHandler="com.le.matrix.redis.enumeration.IntValueEnumTypeHandler"/>
+	    <result column="AUDIT_INFO" property="auditInfo" />
+	    <result column="AUDIT_TIME" property="auditTime" />
+	    <result column="AUDIT_USER" property="auditUser" />
+	    <result column="DELETED" property="deleted" />
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.REGION_ID,redis.CONFIG_ID,redis.AZ_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.CREATE_TIME,redis.CREATE_USER
+	    ,redis.STATUS,redis.AUDIT_INFO,redis.AUDIT_TIME,redis.AUDIT_USER
+	</sql>
+	<sql id="All_Column">
+	    redis.ID,redis.NAME,redis.TYPE,redis.MEMORY_SIZE,redis.REGION_ID,redis.CONFIG_ID,redis.AZ_ID,redis.PASSWORD,redis.SERVICE_ID,redis.DESCN,redis.DELETED,redis.CREATE_TIME,redis.UPDATE_TIME,redis.CREATE_USER,redis.UPDATE_USER
+		,redis.STATUS,redis.AUDIT_INFO,redis.AUDIT_TIME,redis.AUDIT_USER
+	</sql>
+	
+	<insert id="insert" parameterType="Redis" useGeneratedKeys="true" keyProperty="id" >
+	    insert into TERRA_REDIS 
+	        (NAME,TYPE,MEMORY_SIZE,REGION_ID,CONFIG_ID,AZ_ID,PASSWORD,SERVICE_ID,DESCN,CREATE_TIME,UPDATE_TIME,CREATE_USER,UPDATE_USER,DELETED
+	        ,STATUS,AUDIT_INFO,AUDIT_TIME,AUDIT_USER) 
+	    values
+	        (#{name},#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
+	         #{memorySize},#{regionId},#{configId},#{azId},#{password},#{serviceId},#{descn},#{createTime},#{updateTime},#{createUser},#{updateUser},#{deleted}
+	         ,#{status,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+	         ,#{auditInfo},#{auditTime},#{auditUser})
+	</insert>
+	
+	<sql id="Common_Where_Clause">
+	    where 1=1
+	    <trim suffixOverrides=",">
+	        <if test="id != null ">
+	            and redis.ID=#{id}
+	        </if>
+	        <if test="name != null ">
+	            and redis.NAME like CONCAT('%',#{name},'%') escape '^'
+	        </if>
+	        <if test="type != null ">
+	            and redis.TYPE=#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+	        </if>
+	        <if test="memorySize != null ">
+	            and redis.MEMORY_SIZE=#{memorySize}
+	        </if>
+	        <if test="regionId != null ">
+	            and redis.REGION_ID=#{regionId}
+	        </if>
+	        <if test="configId != null ">
+	            and redis.CONFIG_ID=#{configId}
+	        </if>
+	        <if test="azId != null ">
+	            and redis.AZ_ID=#{azId}
+	        </if>
+	        <if test="password != null ">
+	            and redis.PASSWORD=#{password}
+	        </if>
+	        <if test="serviceId != null ">
+	            and redis.SERVICE_ID=#{serviceId}
+	        </if>
+	        <if test="descn != null ">
+	            and redis.DESCN=#{descn}
+	        </if>
+	        <if test="deleted != null">
+				and redis.DELETED=#{deleted}
+			</if>
+	        <if test="createTime != null ">
+	            and redis.CREATE_TIME=#{createTime}
+	        </if>
+	        <if test="updateTime != null ">
+	            and redis.UPDATE_TIME=#{updateTime}
+	        </if>
+	        <if test="createUser != null ">
+	            and redis.CREATE_USER=#{createUser}
+	        </if>
+	        <if test="updateUser != null ">
+	            and redis.UPDATE_USER=#{updateUser}
+	        </if>
+	        <if test="status != null ">
+	            and redis.STATUS=#{status,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+	        </if>
+	        <if test="auditInfo != null ">
+	            and redis.AUDIT_INFO=#{auditInfo}
+	        </if>
+	        <if test="auditTime != null ">
+	            and redis.AUDIT_TIME=#{auditTime}
+	        </if>
+	        <if test="auditUser != null ">
+	            and redis.AUDIT_USER=#{auditUser}
+	        </if>
+	    </trim>
+	</sql>
+	
+	<update id="updateBySelective" parameterType="Redis">
+		update TERRA_REDIS
+		<set>
+			 <if test="name != null ">
+	           NAME = #{name},
+	        </if>
+	        <if test="type != null ">
+	            TYPE=#{type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
+	        </if>
+	        <if test="memorySize != null ">
+	            MEMORY_SIZE=#{memorySize},
+	        </if>
+	        <if test="regionId != null ">
+	            REGION_ID=#{regionId},
+	        </if>
+	        <if test="configId != null ">
+	            CONFIG_ID=#{configId},
+	        </if>
+	        <if test="azId != null ">
+	            AZ_ID=#{azId},
+	        </if>
+	        <if test="password != null ">
+	            PASSWORD=#{password},
+	        </if>
+	        <if test="serviceId != null ">
+	            SERVICE_ID=#{serviceId},
+	        </if>
+	        <if test="descn != null ">
+	            DESCN=#{descn},
+	        </if>
+	        <if test="deleted != null">
+				DELETED=#{deleted},
+			</if>
+	        <if test="createTime != null ">
+	            CREATE_TIME=#{createTime},
+	        </if>
+	        <if test="updateTime != null ">
+	            UPDATE_TIME=#{updateTime},
+	        </if>
+	        <if test="createUser != null ">
+	            CREATE_USER=#{createUser},
+	        </if>
+	        <if test="updateUser != null ">
+	            UPDATE_USER=#{updateUser},
+	        </if>
+	        <if test="status != null ">
+	            STATUS=#{status,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler},
+	        </if>
+	        <if test="auditInfo != null ">
+	            AUDIT_INFO=#{auditInfo},
+	        </if>
+	        <if test="auditTime != null ">
+	            AUDIT_TIME=#{auditTime},
+	        </if>
+	        <if test="auditUser != null ">
+	            AUDIT_USER=#{auditUser},
+	        </if>
+		</set>
+		where ID = #{id,jdbcType=BIGINT}
+	</update>
+	
+	<delete id="delete" parameterType="Redis">
+		delete from TERRA_REDIS where ID = #{id}
+	</delete>
+	
+	
+	<!-- 根据id查询-->
+	<select id="selectById" resultMap="BaseResultMap" parameterType="java.lang.Long">
+		select
+			<include refid="Base_Column_List" />
+		from TERRA_REDIS redis where redis.ID = #{id}
+	</select>
+	
+	<select id="selectByMap" resultMap="BaseResultMap" parameterType="java.util.Map">
+	    select
+	        <include refid="Base_Column_List" />
+	    from
+	        TERRA_REDIS redis
+	        <include refid="Common_Where_Clause" />
+	</select>
+	
+	<!-- 列表总数 -->
+	<select id="selectByMapCount" resultType="java.lang.Integer" parameterType="com.letv.common.dao.QueryParam">
+		select 
+			count(1) 
+		from 
+			TERRA_REDIS redis
+			<include refid="Page_Where_Clause" />
+	</select>
+	
+	<!-- 分页：根据条件查询 -->
+	<select id="selectPageByMap" resultMap="BaseResultMap" parameterType="com.letv.common.dao.QueryParam">
+		select
+			<include refid="Base_Column_List" />
+		from 
+			TERRA_REDIS redis
+			<include refid="Page_Where_Clause" />
+		ORDER BY redis.CREATE_TIME DESC
+			<if test="page != null">
+	      		limit #{page.startRowPosition},#{page.recordsPerPage}
+	    	</if>
+	</select>
+	
+	<sql id="Page_Where_Clause">
+		where 1=1
+		<trim suffixOverrides=",">
+			<if test="params != null and params.id != null  ">
+				and redis.ID=#{params.id}
+			</if>
+			<if test="params != null and params.name != null and params.name != '' ">
+				and redis.NAME like CONCAT('%',#{params.name},'%') escape '^'
+			</if>
+			<if test="params != null and params.regionId != null  ">
+				and redis.REGION_ID=#{params.regionId}
+			</if>
+			<if test="params != null and params.configId != null  ">
+				and redis.CONFIG_ID=#{params.configId}
+			</if>
+			<if test="params != null and params.azId != null  ">
+				and redis.AZ_ID=#{params.azId}
+			</if>
+			<if test="params != null and params.type != null and params.type != ''  ">
+				and redis.TYPE=#{params.type,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+			</if>
+			<if test="params != null and params.descn != null and params.descn != ''  ">
+				and redis.DESCN=#{params.descn}
+			</if>
+			<if test="params != null and params.deleted != null and params.deleted != ''  ">
+				and redis.DELETED=#{params.deleted}
+			</if>
+			<if test="params != null and params.createTime != null  ">
+				and redis.CREATE_TIME=#{params.createTime}
+			</if>
+			<if test="params != null and params.createUser != null and params.createUser != ''  ">
+				and redis.CREATE_USER=#{params.createUser}
+			</if>
+			<if test="params != null and params.updateTime != null  ">
+				and redis.UPDATE_TIME=#{params.updateTime}
+			</if>
+			<if test="params != null and params.updateUser != null  ">
+				and redis.UPDATE_USER=#{params.updateUser}
+			</if>
+			<if test="params != null and params.status != null and params.status != ''  ">
+				and redis.STATUS=#{params.status,jdbcType=TINYINT,typeHandler=com.le.matrix.redis.enumeration.IntValueEnumTypeHandler}
+			</if>
+			<if test="params != null and params.auditInfo != null and params.auditInfo != ''  ">
+				and redis.AUDIT_INFO=#{params.auditInfo}
+			</if>
+			<if test="params != null and params.auditTime != null and params.auditTime != ''  ">
+				and redis.AUDIT_TIME=#{params.auditTime}
+			</if>
+			<if test="params != null and params.auditUser != null and params.auditUser != ''  ">
+				and redis.AUDIT_USER=#{params.auditUser}
+			</if>
+		</trim>
+	</sql>
+</mapper>   

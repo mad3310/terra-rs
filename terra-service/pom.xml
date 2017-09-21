@@ -24,6 +24,11 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>com.le.matrix.hemera</groupId>
+        	<artifactId>hemera-facade</artifactId>
+        	<version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>

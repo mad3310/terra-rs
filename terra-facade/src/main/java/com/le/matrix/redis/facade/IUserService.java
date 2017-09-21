@@ -1,7 +1,5 @@
 package com.le.matrix.redis.facade;
 
-import java.util.Map;
-
 import com.le.matrix.redis.model.User;
 
 public interface IUserService extends IBaseService<User> {
